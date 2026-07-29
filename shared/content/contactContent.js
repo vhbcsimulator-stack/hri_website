@@ -27,7 +27,6 @@ export const contactContentData = {
     socials: [
       { network: 'facebook', href: '#' },
       { network: 'instagram', href: '#' },
-      { network: 'linkedin', href: '#' },
     ],
   },
   map: {

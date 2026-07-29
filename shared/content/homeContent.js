@@ -18,6 +18,9 @@ export const homeContentData = {
     title: 'Featured Projects',
     items: [
       {
+        // Must match a `slug` in projectsContent.js — it picks which project
+        // the card opens.
+        slug: 'residential-communities',
         tag: 'Exclusive',
         title: 'Residential Communities',
         copy: 'Build the home you envision in a thoughtfully planned community designed for comfortable living and future growth.',
@@ -26,6 +29,7 @@ export const homeContentData = {
         linkLabel: 'Explore',
       },
       {
+        slug: 'commercial-opportunities',
         tag: '',
         title: 'Commercial Opportunities',
         copy: 'Discover strategically positioned commercial lots suitable for businesses, rental developments, and future ventures.',

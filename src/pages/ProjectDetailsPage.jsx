@@ -3,9 +3,11 @@ import { useSearchParams, Link as RouterLink } from 'react-router-dom'
 import { Box, Container, Typography, Stack, Button, TextField, Chip } from '@mui/material'
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined'
 import Reveal from '../components/Reveal'
+import HeroTitleReveal from '../components/HeroTitleReveal'
+import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { getProjectsContent, projectsContentData } from '../../shared/content/projectsContent'
+import { PROJECTS_PAGE_ID, projectsContentData } from '../../shared/content/projectsContent'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 // Underlined form field styled for the dark green enquiry section.
@@ -21,7 +23,7 @@ const whiteField = {
 export default function ProjectDetailsPage() {
   const [params] = useSearchParams()
   const slug = params.get('slug')
-  const content = usePageContent(getProjectsContent, projectsContentData)
+  const content = usePageContent(PROJECTS_PAGE_ID, projectsContentData)
   const projects = content.projects || []
   // Fall back to the first project so a missing/legacy link still renders.
   const project = projects.find((p) => p.slug === slug) || projects[0]
@@ -105,7 +107,7 @@ export default function ProjectDetailsPage() {
                 overflowWrap: 'anywhere',
               }}
             >
-              {project.title}
+              <HeroTitleReveal>{project.title}</HeroTitleReveal>
             </Typography>
           </Box>
           <Typography sx={{ maxWidth: 640, mx: 'auto', fontSize: { xs: 14.5, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)', mb: 4 }}>
@@ -130,7 +132,7 @@ export default function ProjectDetailsPage() {
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: { xs: 6, md: 8 }, alignItems: 'center' }}>
             <Box>
               <Typography sx={{ textTransform: 'uppercase', letterSpacing: '2px', fontSize: 13, fontWeight: 600, color: 'primary.main', mb: 2 }}>
-                {intro.eyebrow}
+                <TypewriterText speed={50}>{intro.eyebrow}</TypewriterText>
               </Typography>
               <Typography sx={{ color: 'text.secondary', fontSize: 16, mb: 3 }}>
                 {intro.description}
@@ -230,7 +232,7 @@ export default function ProjectDetailsPage() {
 
       {/* Begin your journey */}
       <Reveal variant="left">
-      <Box component="section" id="inquire" sx={{ scrollMarginTop: { xs: '76px', md: '88px' }, py: { xs: 8, md: 11 }, background: 'linear-gradient(180deg, #006600 0%, #024A01 55%, #021c02 100%)', color: '#fff' }}>
+      <Box component="section" id="inquire" sx={{ py: { xs: 8, md: 11 }, background: 'linear-gradient(180deg, #006600 0%, #024A01 55%, #021c02 100%)', color: '#fff' }}>
         <Container>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.2fr' }, gap: { xs: 5, md: 8 } }}>
             <Box>
@@ -249,7 +251,7 @@ export default function ProjectDetailsPage() {
                 <TextField variant="standard" label="Message (optional)" value={form.message} onChange={onForm('message')} fullWidth multiline minRows={2} sx={whiteField} />
                 <Button type="submit" variant="outlined" size="large"
                   sx={{ alignSelf: 'flex-start', color: '#fff', borderColor: 'rgba(255,255,255,.6)', '&:hover': { borderColor: '#fff', bgcolor: 'rgba(255,255,255,.12)' } }}>
-                  Inquire
+                  Submit
                 </Button>
               </Stack>
             </Box>

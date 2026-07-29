@@ -5,13 +5,14 @@ import {
 } from '@mui/material'
 import FacebookIcon from '@mui/icons-material/Facebook'
 import InstagramIcon from '@mui/icons-material/Instagram'
-import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import Reveal from '../components/Reveal'
+import HeroTitleReveal from '../components/HeroTitleReveal'
+import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { getContactContent, contactContentData } from '../../shared/content/contactContent'
+import { CONTACT_PAGE_ID, contactContentData } from '../../shared/content/contactContent'
 
 const PROPERTY_OPTIONS = ['Residential', 'Commercial']
 
@@ -20,14 +21,13 @@ const PROPERTY_OPTIONS = ['Residential', 'Commercial']
 const SOCIAL_ICONS = {
   facebook: <FacebookIcon fontSize="small" />,
   instagram: <InstagramIcon fontSize="small" />,
-  linkedin: <LinkedInIcon fontSize="small" />,
 }
-const socialIcon = (network) => SOCIAL_ICONS[network] || <HelpOutlineIcon fontSize="small" />
+const socialIcon = (network) => SOCIAL_ICONS[network]
 
 const EMPTY = { first: '', last: '', email: '', phone: '', interest: '', message: '' }
 
 export default function ContactPage() {
-  const content = usePageContent(getContactContent, contactContentData)
+  const content = usePageContent(CONTACT_PAGE_ID, contactContentData)
   const { hero, inquiry, map, faq } = content
 
   const [form, setForm] = useState(EMPTY)
@@ -56,8 +56,12 @@ export default function ContactPage() {
       {/* Hero */}
       <Box sx={{ background: 'linear-gradient(150deg, #006600 0%, #024A01 60%, #032803 100%)', color: '#fff', pt: { xs: 14, md: 17 }, pb: { xs: 14, md: 10 }, textAlign: 'center' }}>
         <Container>
-          <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: { xs: 13, md: 15 }, fontWeight: 600, color: '#a8ffa8', mb: 1.5 }}>{hero.eyebrow}</Typography>
-          <Typography variant="h1" sx={{ fontSize: { xs: 42, md: 72 }, fontWeight: 800 }}>{hero.title}</Typography>
+          <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: { xs: 13, md: 15 }, fontWeight: 600, color: '#a8ffa8', mb: 1.5 }}>
+            <TypewriterText speed={50}>{hero.eyebrow}</TypewriterText>
+          </Typography>
+          <Typography variant="h1" sx={{ fontSize: { xs: 42, md: 72 }, fontWeight: 800 }}>
+            <HeroTitleReveal>{hero.title}</HeroTitleReveal>
+          </Typography>
           <Box sx={{ width: 90, height: 3, borderRadius: 2, bgcolor: 'rgba(255,255,255,.7)', mt: 3, mx: 'auto' }} />
           <Typography sx={{ mt: 3, maxWidth: 620, mx: 'auto', fontSize: { xs: 15, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)' }}>
             {hero.subtitle}
@@ -106,7 +110,7 @@ export default function ContactPage() {
                   {inquiry.socialsLabel}
                 </Typography>
                 <Stack direction="row" spacing={1.5}>
-                  {inquiry.socials.map((s, i) => (
+                  {inquiry.socials.filter((s) => s.network !== 'linkedin').map((s, i) => (
                     <IconButton key={i} href={s.href} aria-label={s.network}
                       sx={{ bgcolor: 'rgba(255,255,255,.14)', color: '#fff', width: 40, height: 40, transition: 'background .2s ease, transform .2s ease', '&:hover': { bgcolor: '#fff', color: 'primary.main', transform: 'translateY(-2px)' } }}>
                       {socialIcon(s.network)}
@@ -125,10 +129,7 @@ export default function ContactPage() {
               )}
               <Box component="form" onSubmit={submit} noValidate>
                 <Stack spacing={2.75}>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2.75 }}>
-                    <TextField label="First Name *" value={form.first} onChange={update('first')} error={!!errors.first} helperText={errors.first} fullWidth />
-                    <TextField label="Last Name *" value={form.last} onChange={update('last')} error={!!errors.last} helperText={errors.last} fullWidth />
-                  </Box>
+                    <TextField label="Full Name *" value={form.first} onChange={update('first')} error={!!errors.first} helperText={errors.first} fullWidth />               
                   <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2.75 }}>
                     <TextField label="Email Address *" value={form.email} onChange={update('email')} error={!!errors.email} helperText={errors.email} fullWidth />
                     <TextField label="Phone Number" value={form.phone} onChange={update('phone')} fullWidth />

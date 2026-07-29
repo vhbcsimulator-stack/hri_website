@@ -53,7 +53,9 @@ function applyPageContent(content, pathname) {
 async function loadContent() {
   try {
     const response = await fetch('/api/content', { cache: 'no-store' })
-    if (response.ok) return response.json()
+    // Awaited, not returned: a static host answers /api/content with index.html,
+    // and an un-awaited json() rejection escapes this catch entirely.
+    if (response.ok) return await response.json()
   } catch {
     // A static deployment uses the snapshot imported during the build.
   }

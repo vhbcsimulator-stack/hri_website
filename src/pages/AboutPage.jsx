@@ -1,9 +1,11 @@
 import { Box, Container, Typography, Stack, Button } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import Reveal from '../components/Reveal'
+import HeroTitleReveal from '../components/HeroTitleReveal'
+import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { getAboutContent, aboutContentData } from '../../shared/content/aboutContent'
+import { ABOUT_PAGE_ID, aboutContentData } from '../../shared/content/aboutContent'
 
 // Brand accent: interlocking blue/green rings used above section titles.
 function BrandCircles({ size = 52 }) {
@@ -31,7 +33,7 @@ function SectionTitle({ children, icon }) {
 // Copy comes from the admin-editable content document; Navbar/Footer are
 // provided by the shared Layout.
 export default function AboutPage() {
-  const content = usePageContent(getAboutContent, aboutContentData)
+  const content = usePageContent(ABOUT_PAGE_ID, aboutContentData)
   const { hero, coreValues, missionVision, whatWeDo, whyChoose, cta } = content
 
   return (
@@ -47,12 +49,14 @@ export default function AboutPage() {
               <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, mb: 2 }}>
                 <Box sx={{ width: 34, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#0000FF,#006600)' }} />
                 <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 12.5, fontWeight: 600, color: 'primary.main' }}>
-                  {hero.eyebrow}
+                  <TypewriterText speed={50}>{hero.eyebrow}</TypewriterText>
                 </Typography>
               </Stack>
               <Typography variant="h2" sx={{ color: 'primary.dark', fontSize: { xs: 34, md: 48 }, mb: 3, textTransform: 'none', lineHeight: 1.1 }}>
-                {hero.titleLead}{' '}
-                <Box component="span" sx={{ color: 'primary.main' }}>{hero.titleHighlight}</Box>
+                <HeroTitleReveal>
+                  {hero.titleLead}{' '}
+                  <Box component="span" sx={{ color: 'primary.main' }}>{hero.titleHighlight}</Box>
+                </HeroTitleReveal>
               </Typography>
               <Typography sx={{ color: 'text.secondary', fontSize: 16, mb: 2.5 }}>
                 {hero.para1}

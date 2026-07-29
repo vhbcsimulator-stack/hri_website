@@ -40,6 +40,19 @@ export default function Footer() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  const scrollToTop = () => {
+    window.dispatchEvent(new Event('site-cancel-smooth-scroll'))
+
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      window.scrollTo({ top: 0, behavior: 'instant' })
+      return
+    }
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
+  }
+
   return (
     <Box component="footer" sx={{ position: 'relative', bgcolor: 'brand.greenDeep', color: 'rgba(255,255,255,.72)' }}>
       <Container sx={{ pt: 7, pb: 5 }}>
@@ -75,16 +88,32 @@ export default function Footer() {
       <Box sx={{ borderTop: '1px solid rgba(255,255,255,.1)', py: 2.5, textAlign: 'center' }}>
         <Typography sx={{ fontSize: 13 }}>© {new Date().getFullYear()} Hermosa Residences Inc. All rights reserved.</Typography>
       </Box>
-      {showTop && (
-        <IconButton onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top"
+      <Box
+        sx={{
+          position: 'fixed',
+          right: 24,
+          bottom: 24,
+          zIndex: 40,
+          opacity: showTop ? 1 : 0,
+          transform: showTop ? 'translateY(0)' : 'translateY(32px)',
+          pointerEvents: showTop ? 'auto' : 'none',
+          transition: 'opacity .3s ease, transform .3s cubic-bezier(.2,.8,.2,1)',
+        }}
+      >
+        <IconButton
+          onClick={scrollToTop}
+          aria-label="Back to top"
           sx={{
-            position: 'fixed', right: 24, bottom: 24, zIndex: 40, bgcolor: 'secondary.main', color: '#fff',
-            '&:hover': { bgcolor: 'secondary.main', transform: 'translateY(-4px)' },
-            transition: 'transform .2s ease',
-          }}>
+            opacity: 0.95,
+            bgcolor: '#006600',
+            color: '#fff',
+            transition: 'transform .2s ease, background-color .2s ease',
+            '&:hover': { bgcolor: '#004100', transform: 'translateY(-4px)' },
+          }}
+        >
           <KeyboardArrowUpIcon />
         </IconButton>
-      )}
+      </Box>
     </Box>
   )
 }

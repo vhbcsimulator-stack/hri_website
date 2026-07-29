@@ -152,7 +152,8 @@
             "copy": "Build the home you envision in a thoughtfully planned community designed for comfortable living and future growth.",
             "tint": "#006600",
             "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
-            "linkLabel": "Explore"
+            "linkLabel": "Explore",
+            "slug": "residential-communities"
           },
           {
             "tag": "",
@@ -160,7 +161,8 @@
             "copy": "Discover strategically positioned commercial lots suitable for businesses, rental developments, and future ventures.",
             "tint": "#0000FF",
             "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
-            "linkLabel": "Explore"
+            "linkLabel": "Explore",
+            "slug": "commercial-opportunities"
           }
         ]
       },

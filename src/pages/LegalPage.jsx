@@ -1,13 +1,15 @@
 import { Box, Container, Divider, Typography } from '@mui/material'
 import PageBanner from '../components/PageBanner'
+import ContentBlocks from '../components/ContentBlocks'
 import usePageContent from '../hooks/usePageContent'
-import { getLegalContent, legalContentData } from '../../shared/content/legalContent'
+import { LEGAL_PAGE_ID, legalContentData, normalizeLegalDoc } from '../../shared/content/legalContent'
 
 // Renders whichever legal document matches `type` (privacy | terms | cookies).
 // Copy comes from the admin-editable content document.
 export default function LegalPage({ type }) {
-  const content = usePageContent(getLegalContent, legalContentData)
-  const page = content[type] || legalContentData[type]
+  const content = usePageContent(LEGAL_PAGE_ID, legalContentData)
+  // Normalised so sections saved before the block model still render.
+  const page = normalizeLegalDoc(content[type] || legalContentData[type])
 
   return (
     <Box>
@@ -15,6 +17,7 @@ export default function LegalPage({ type }) {
         eyebrow={page.eyebrow}
         title={page.title}
         subtitle={page.subtitle}
+        paragraphs={page.heroParagraphs}
         crumbs={[{ label: page.title }]}
       />
       <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: 'brand.surface' }}>
@@ -29,9 +32,7 @@ export default function LegalPage({ type }) {
                 <Typography component="h2" sx={{ color: 'primary.dark', fontSize: { xs: 20, md: 23 }, fontWeight: 700, mb: 1.5 }}>
                   {section.heading}
                 </Typography>
-                <Typography sx={{ color: 'text.secondary', fontSize: 15.5, lineHeight: 1.9 }}>
-                  {section.copy}
-                </Typography>
+                <ContentBlocks blocks={section.blocks} />
               </Box>
             ))}
           </Box>

@@ -1,12 +1,12 @@
-import { Box, Container, Link as MuiLink, Typography } from '@mui/material'
-import { Link as RouterLink } from 'react-router-dom'
-import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded'
+import { Box, Container, Divider, Typography } from '@mui/material'
 import PageBanner from '../components/PageBanner'
+import ContentBlocks from '../components/ContentBlocks'
 import usePageContent from '../hooks/usePageContent'
-import { getSitemapContent, sitemapContentData } from '../../shared/content/sitemapContent'
+import { SITEMAP_PAGE_ID, sitemapContentData, normalizeSitemapContent } from '../../shared/content/sitemapContent'
 
 export default function SitemapPage() {
-  const content = usePageContent(getSitemapContent, sitemapContentData)
+  // Normalised so groups saved before the block model still render.
+  const content = normalizeSitemapContent(usePageContent(SITEMAP_PAGE_ID, sitemapContentData))
 
   return (
     <Box>
@@ -14,27 +14,25 @@ export default function SitemapPage() {
         eyebrow={content.eyebrow}
         title={content.title}
         subtitle={content.subtitle}
+        paragraphs={content.heroParagraphs}
         crumbs={[{ label: content.title }]}
       />
       <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: 'brand.surface' }}>
         <Container maxWidth="md">
-          <Typography sx={{ color: 'text.secondary', lineHeight: 1.9, maxWidth: 720, mb: 5 }}>
-            {content.intro}
-          </Typography>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 3 }}>
+          {/* Single document card with divider-separated sections, matching the
+              legal pages. */}
+          <Box sx={{ bgcolor: '#fff', border: '1px solid', borderColor: 'brand.line', borderRadius: 3, p: { xs: 3, sm: 5, md: 7 } }}>
+            <Typography sx={{ color: 'text.secondary', fontSize: 15.5, lineHeight: 1.9, mb: 4 }}>
+              {content.intro}
+            </Typography>
             {content.groups.map((group, gi) => (
-              <Box key={gi} sx={{ bgcolor: '#fff', border: '1px solid', borderColor: 'brand.line', borderRadius: 3, p: { xs: 3, md: 4 } }}>
-                <Typography component="h2" sx={{ color: 'primary.dark', fontSize: 22, fontWeight: 700, mb: 2.5 }}>
+              <Box component="section" key={gi}>
+                {gi > 0 && <Divider sx={{ my: { xs: 3.5, md: 4.5 }, borderColor: 'brand.line' }} />}
+                <Typography component="h2" sx={{ color: 'primary.dark', fontSize: { xs: 20, md: 23 }, fontWeight: 700, mb: 1.5 }}>
                   {group.title}
                 </Typography>
-                <Box component="nav" aria-label={`${group.title} sitemap links`}>
-                  {group.links.map((link, li) => (
-                    <MuiLink key={li} component={RouterLink} to={link.to} underline="none" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.25, color: 'text.secondary', fontSize: 15, borderBottom: '1px solid', borderColor: 'brand.line', transition: 'color .2s ease, padding-left .2s ease', '&:hover': { color: 'primary.main', pl: 0.75 }, '&:last-child': { borderBottom: 0 } }}>
-                      {link.label}
-                      <ArrowForwardRoundedIcon sx={{ fontSize: 18 }} />
-                    </MuiLink>
-                  ))}
-                </Box>
+                {/* Plain text, not links — the legal pages' body treatment. */}
+                <ContentBlocks blocks={group.blocks} />
               </Box>
             ))}
           </Box>

@@ -26,7 +26,10 @@ function App() {
         <Route path="/sitemap" element={<SitemapPage />} />
       </Route>
     </Routes>
-    <ContentManager />
+    {/* Dev-only: the overlay editor reads /api/content, which exists only
+        behind the Vite middleware. In a production build it can never load
+        anything but the snapshot the pages already render. */}
+    {import.meta.env.DEV && <ContentManager />}
     </>
   )
 }

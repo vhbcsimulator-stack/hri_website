@@ -16,9 +16,16 @@ const VARIANTS = {
 // viewport. Respects prefers-reduced-motion. `variant` picks the motion,
 // `delay` (ms) staggers items, `duration` (ms) tunes speed.
 export default function Reveal({
-  children, variant = 'up', delay = 0, duration = 700, once = true, sx,
+  children,
+  variant = 'up',
+  delay = 0,
+  duration = 700,
+  once = true,
+  postRevealMotion = true,
+  sx,
 }) {
   const ref = useRef(null)
+  const contentRef = useRef(null)
   const [shown, setShown] = useState(false)
 
   useEffect(() => {
@@ -45,6 +52,46 @@ export default function Reveal({
     return () => io.disconnect()
   }, [once])
 
+  useEffect(() => {
+    const element = ref.current
+    const content = contentRef.current
+    if (!element || !content || !shown || !postRevealMotion) return undefined
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined
+
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const rect = element.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const elementCenter = rect.top + rect.height / 2
+      const distanceFromCenter = (elementCenter - viewportHeight / 2) / (viewportHeight / 2)
+      // Only the approach from below drives the effect: positive means the
+      // section still sits under the viewport centre. Once it passes the centre
+      // the value clamps to 0, so scrolling further down keeps it fully zoomed
+      // in — it only zooms back out when you scroll up past the centre again.
+      const approach = Math.max(0, Math.min(1, distanceFromCenter))
+      const translateY = approach * 18
+      const scale = 1 - approach * 0.03
+
+      content.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`
+    }
+
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    window.addEventListener('resize', requestUpdate)
+
+    return () => {
+      window.removeEventListener('scroll', requestUpdate)
+      window.removeEventListener('resize', requestUpdate)
+      window.cancelAnimationFrame(frame)
+      content.style.transform = ''
+    }
+  }, [postRevealMotion, shown])
+
   const hidden = VARIANTS[variant] ?? VARIANTS.up
 
   return (
@@ -58,7 +105,21 @@ export default function Reveal({
         ...sx,
       }}
     >
-      {children}
+      <Box
+        ref={contentRef}
+        sx={{
+          transform: 'translate3d(0, 0, 0)',
+          transformOrigin: 'center center',
+          transition: 'transform 70ms linear',
+          willChange: shown && postRevealMotion ? 'transform' : 'auto',
+          '@media (prefers-reduced-motion: reduce)': {
+            transform: 'none !important',
+            transition: 'none',
+          },
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   )
 }

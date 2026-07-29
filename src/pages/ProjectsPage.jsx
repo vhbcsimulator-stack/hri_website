@@ -9,12 +9,12 @@ import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined'
 import HomeWorkOutlinedIcon from '@mui/icons-material/HomeWorkOutlined'
 import TuneIcon from '@mui/icons-material/Tune'
 import Reveal from '../components/Reveal'
+import HeroTitleReveal from '../components/HeroTitleReveal'
 import usePageContent from '../hooks/usePageContent'
-import { getProjectsContent, projectsContentData } from '../../shared/content/projectsContent'
+import { PROJECTS_PAGE_ID, projectsContentData } from '../../shared/content/projectsContent'
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1920&q=80'
 
-const LOCATIONS = ['All Location', 'Batangas', 'Cavite', 'Pangasinan']
 const TYPES = ['All Types', 'Residential', 'Commercial']
 
 // Rounded input styling for the search/filter bar, with hover + focus accents.
@@ -78,8 +78,19 @@ function ProjectCard({ project }) {
 }
 
 export default function ProjectsPage() {
-  const content = usePageContent(getProjectsContent, projectsContentData)
-  const projects = content.projects || []
+  const content = usePageContent(PROJECTS_PAGE_ID, projectsContentData)
+  const projects = useMemo(() => content.projects || [], [content.projects])
+  const locations = useMemo(
+    () => [
+      'All Location',
+      ...new Set(
+        projects
+          .map((project) => String(project.location || '').trim())
+          .filter(Boolean),
+      ),
+    ],
+    [projects],
+  )
 
   const [search, setSearch] = useState('')
   const [location, setLocation] = useState('All Location')
@@ -91,7 +102,7 @@ export default function ProjectsPage() {
     const q = search.trim().toLowerCase()
     return projects.filter((p) => {
       const matchesSearch = !q || [p.title, p.summary, p.location].some((f) => String(f).toLowerCase().includes(q))
-      const matchesLocation = location === 'All Location' || String(p.location).toLowerCase().includes(location.toLowerCase())
+      const matchesLocation = location === 'All Location' || String(p.location).trim() === location
       const matchesType = type === 'All Types' || p.type === type
       return matchesSearch && matchesLocation && matchesType
     })
@@ -128,7 +139,7 @@ export default function ProjectsPage() {
         <Container sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
           <Box ref={headingRef} sx={{ willChange: 'transform, opacity' }}>
             <Typography variant="h1" sx={{ fontSize: { xs: 44, md: 84 }, fontWeight: 800, mb: 2 }}>
-              Our Projects
+              <HeroTitleReveal>Our Projects</HeroTitleReveal>
             </Typography>
             <Typography sx={{ maxWidth: 760, mx: 'auto', fontSize: { xs: 15, md: 18 }, fontWeight: 300, color: 'rgba(255,255,255,.9)', mb: 5 }}>
               Explore thoughtfully planned residential, leisure, and commercial property developments designed
@@ -152,7 +163,7 @@ export default function ProjectsPage() {
             />
             <TextField select size="small" value={location} onChange={(e) => setLocation(e.target.value)}
               slotProps={{ input: { startAdornment: (<InputAdornment position="start"><PlaceOutlinedIcon sx={{ color: 'primary.main', fontSize: 20 }} /></InputAdornment>) } }}>
-              {LOCATIONS.map((l) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
+              {locations.map((l) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
             </TextField>
             <TextField select size="small" value={type} onChange={(e) => setType(e.target.value)}
               slotProps={{ input: { startAdornment: (<InputAdornment position="start"><HomeWorkOutlinedIcon sx={{ color: 'primary.main', fontSize: 20 }} /></InputAdornment>) } }}>

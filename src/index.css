@@ -6,6 +6,35 @@
 
 html {
   scroll-behavior: smooth;
+  /* Keeps in-page anchor targets clear of the fixed navbar. */
+  scroll-padding-top: 76px;
+}
+
+@media (min-width: 900px) {
+  html {
+    scroll-padding-top: 88px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* IE and older Edge */
+body {
+  -ms-overflow-style: none;
 }
 
 body {

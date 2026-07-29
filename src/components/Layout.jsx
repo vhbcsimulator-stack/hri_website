@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Box } from '@mui/material'
 import Navbar from './Navbar'
@@ -7,10 +7,11 @@ import Footer from './Footer'
 // App shell: fixed navbar, routed page content, footer.
 // Resets scroll position on every navigation.
 export default function Layout() {
-  const { pathname } = useLocation()
-  useEffect(() => {
+  const { pathname, search } = useLocation()
+  useLayoutEffect(() => {
+    window.dispatchEvent(new Event('site-scroll-to-top'))
     window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [pathname])
+  }, [pathname, search])
 
   return (
     <Box sx={{ overflowX: 'hidden' }}>

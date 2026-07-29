@@ -14,9 +14,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import Reveal from '../components/Reveal'
+import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { getHomeContent, homeContentData } from '../../shared/content/homeContent'
+import { HOME_PAGE_ID, homeContentData } from '../../shared/content/homeContent'
 
 // Hero banner section.
 function Hero({ hero }) {
@@ -76,12 +77,52 @@ function Hero({ hero }) {
       <Container ref={contentRef} sx={{ position: 'relative', zIndex: 2, py: { xs: 14, md: 16 }, willChange: 'transform, opacity, filter' }}>
         <Box sx={{ maxWidth: 820 }}>
           <Typography sx={{ textTransform: 'uppercase', letterSpacing: '4px', fontSize: 13, fontWeight: 500, color: '#b7f0b7', mb: 2 }}>
-            {hero.eyebrow}
+            <TypewriterText speed={50}>{hero.eyebrow}</TypewriterText>
           </Typography>
           <Typography variant="h1" sx={{ fontSize: { xs: 40, sm: 56, md: 78 } }}>
-            {hero.title}
-            <Box component="span" sx={{ display: 'block', color: '#a8ffa8', fontWeight: 700 }}>
-              {hero.titleHighlight}
+            <Box component="span" sx={{ display: 'block', overflow: 'hidden', pb: '.08em', mb: '-.08em' }}>
+              <Box
+                component="span"
+                sx={{
+                  display: 'block',
+                  opacity: 0,
+                  animation: 'heroTitleReveal 900ms cubic-bezier(.16, 1, .3, 1) 120ms forwards',
+                  '@keyframes heroTitleReveal': {
+                    from: { opacity: 0, transform: 'translateY(105%)' },
+                    to: { opacity: 1, transform: 'translateY(0)' },
+                  },
+                  '@media (prefers-reduced-motion: reduce)': {
+                    opacity: 1,
+                    animation: 'none',
+                    transform: 'none',
+                  },
+                }}
+              >
+                {hero.title}
+              </Box>
+            </Box>
+            <Box component="span" sx={{ display: 'block', overflow: 'hidden', pb: '.08em', mb: '-.08em' }}>
+              <Box
+                component="span"
+                sx={{
+                  display: 'block',
+                  color: '#a8ffa8',
+                  fontWeight: 700,
+                  opacity: 0,
+                  animation: 'heroHighlightReveal 950ms cubic-bezier(.16, 1, .3, 1) 340ms forwards',
+                  '@keyframes heroHighlightReveal': {
+                    from: { opacity: 0, transform: 'translateY(105%) scale(.98)' },
+                    to: { opacity: 1, transform: 'translateY(0) scale(1)' },
+                  },
+                  '@media (prefers-reduced-motion: reduce)': {
+                    opacity: 1,
+                    animation: 'none',
+                    transform: 'none',
+                  },
+                }}
+              >
+                {hero.titleHighlight}
+              </Box>
             </Box>
           </Typography>
           <Typography sx={{ mt: 3, maxWidth: 640, fontSize: { xs: 16, md: 19 }, fontWeight: 300, color: 'rgba(255,255,255,.9)' }}>
@@ -98,7 +139,7 @@ function Hero({ hero }) {
           </Stack>
         </Box>
       </Container>
-      <IconButton href="#projects" aria-label="Scroll down"
+      <IconButton href="#projects" 
         sx={{
           position: 'absolute', bottom: 26, left: '50%', transform: 'translateX(-50%)', zIndex: 2,
           color: '#fff', border: '1.5px solid rgba(255,255,255,.5)',
@@ -117,7 +158,7 @@ function SectionHead({ eyebrow, title, sub, center, underline }) {
     <Box sx={{ mb: 5.5, textAlign: center ? 'center' : 'left', maxWidth: center ? 700 : 'none', mx: center ? 'auto' : 0 }}>
       {eyebrow && (
         <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 12.5, fontWeight: 600, color: 'primary.main', mb: 1 }}>
-          {eyebrow}
+          <TypewriterText speed={50}>{eyebrow}</TypewriterText>
         </Typography>
       )}
       <Typography variant="h2" sx={{
@@ -129,7 +170,11 @@ function SectionHead({ eyebrow, title, sub, center, underline }) {
       }}>
         {title}
       </Typography>
-      {sub && <Typography sx={{ mt: 2, color: 'text.secondary', fontSize: 16 }}>{sub}</Typography>}
+      {sub && (
+        <Typography sx={{ mt: 2, color: 'text.secondary', fontSize: 16 }}>
+          {sub}
+        </Typography>
+      )}
     </Box>
   )
 }
@@ -147,58 +192,192 @@ function FeaturedProjects({ featured }) {
   return (
     <Box component="section" id="projects" sx={{ py: { xs: 8, md: 12 } }}>
       <Container>
-        <SectionHead eyebrow={featured.eyebrow} title={featured.title} />
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3.5 }}>
+        <SectionHead
+          eyebrow={featured.eyebrow}
+          title={featured.title}
+        />
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: '1fr 1fr',
+            },
+            gap: 3.5,
+          }}
+        >
           {featured.items.map((p) => (
-            <Card key={p.title} elevation={0} component={RouterLink} to="/projects"
+            <Card
+              key={p.slug || p.title}
+              elevation={0}
+              component={RouterLink}
+              // A card with no slug would land on `?slug=undefined`, which the
+              // details page silently resolves to the first project. Send it to
+              // the projects list instead.
+              to={p.slug ? `/project-details?slug=${encodeURIComponent(p.slug)}` : '/projects'}
               sx={{
                 textDecoration: 'none',
-                position: 'relative', minHeight: { xs: 580, md: 700 }, display: 'flex', alignItems: 'flex-end',
-                borderRadius: 1, overflow: 'hidden', color: '#fff',
-                boxShadow: '0 18px 40px -12px rgba(0, 0, 0, 0.28)',
+                position: 'relative',
+                minHeight: {
+                  xs: 580,
+                  md: 700,
+                },
+                display: 'flex',
+                alignItems: 'flex-end',
+                borderRadius: 1,
+                overflow: 'hidden',
+                color: '#fff',
+
+                boxShadow:
+                  '0 18px 40px -12px rgba(0, 0, 0, 0.28)',
+
                 transition: 'transform .35s ease',
+
                 backgroundColor: '#0c3d0c',
+
                 '&::before': {
-                  content: '""', position: 'absolute', inset: 0,
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+
                   backgroundImage: `url(${p.image})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
+
                   transition: 'transform .5s ease',
                 },
+
                 '&::after': {
-                  content: '""', position: 'absolute', inset: 0,
-                  background: `linear-gradient(200deg, ${p.tint}4d, transparent 55%)`,
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+
+                  background: `linear-gradient(
+                    200deg,
+                    ${p.tint}4d,
+                    transparent 55%
+                  )`,
                 },
-                '&:hover': { transform: 'translateY(-6px)' },
-                '&:hover::before': { transform: 'scale(1.06)' },
-                '&:hover .exploreLink': { gap: 1.75 },
+
+                '&:hover': {
+                  transform: 'translateY(-6px)',
+                },
+
+                '&:hover::before': {
+                  transform: 'scale(1.06)',
+                },
+
+                '&:hover .exploreLink': {
+                  gap: 1.75,
+                },
               }}
             >
               {p.tag && (
-                <Box sx={{
-                  position: 'absolute', top: 20, left: 20, zIndex: 3, bgcolor: 'rgba(255, 215, 0.60)', color: 'rgb(20, 30, 60)',
-                  fontSize: 11, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase',
-                  px: 1.75, py: .75, borderRadius: 1.5,
-                }}>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 20,
+                    left: 20,
+                    zIndex: 3,
+
+                    bgcolor: 'rgba(255, 215, 0, 0.60)',
+                    color: 'rgb(20, 30, 60)',
+
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '1.5px',
+                    textTransform: 'uppercase',
+
+                    px: 1.75,
+                    py: 0.75,
+
+                    borderRadius: 1.5,
+                  }}
+                >
                   {p.tag}
                 </Box>
               )}
-              <Box aria-hidden sx={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,.88) 22%, rgba(0,0,0,.55) 40%, transparent 62%)',
-              }} />
-              <Box sx={{ position: 'relative', zIndex: 2, p: 4 }}>
-                <Typography variant="h3" sx={{ fontSize: 22, textTransform: 'uppercase', letterSpacing: '.4px' }}>
+
+              {/* Dark gradient overlay */}
+              <Box
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+
+                  background: `
+                    linear-gradient(
+                      to top,
+                      #000 0%,
+                      rgba(0,0,0,.88) 22%,
+                      rgba(0,0,0,.55) 40%,
+                      transparent 62%
+                    )
+                  `,
+                }}
+              />
+
+              {/* Content */}
+              <Box
+                sx={{
+                  position: 'relative',
+                  zIndex: 2,
+                  p: 4,
+                  width: '100%',
+                }}
+              >
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontSize: 22,
+                    textTransform: 'uppercase',
+                    letterSpacing: '.4px',
+                  }}
+                >
                   {p.title}
                 </Typography>
-                <Typography sx={{ mt: 1.25, fontSize: 14.5, color: 'rgba(255,255,255,.85)', maxWidth: '90%' }}>
+
+                <Typography
+                  sx={{
+                    mt: 1.25,
+                    fontSize: 14.5,
+                    color: 'rgba(255,255,255,.85)',
+                    maxWidth: '90%',
+                  }}
+                >
                   {p.copy}
                 </Typography>
-                <Stack className="exploreLink" direction="row" spacing={1}
-                  sx={{ mt: 2.25, ml: 'auto', width: 'fit-content', alignItems: 'center', color: '#a8ffa8', fontWeight: 600, fontSize: 13, letterSpacing: '1.5px',
-                    textTransform: 'uppercase', transition: 'gap .2s ease' }}>
-                  <span>{p.linkLabel}</span>
-                  <ArrowForwardIcon sx={{ fontSize: 16 }} />
+
+                <Stack
+                  className="exploreLink"
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    mt: 2.25,
+                    ml: 'auto',
+                    width: 'fit-content',
+
+                    alignItems: 'center',
+
+                    color: '#a8ffa8',
+                    fontWeight: 600,
+                    fontSize: 13,
+                    letterSpacing: '1.5px',
+                    textTransform: 'uppercase',
+
+                    transition: 'gap .2s ease',
+                  }}
+                >
+                  <Typography component="span">
+                    Explore
+                  </Typography>
+
+                  <ArrowForwardIcon
+                    sx={{
+                      fontSize: 16,
+                    }}
+                  />
                 </Stack>
               </Box>
             </Card>
@@ -206,7 +385,7 @@ function FeaturedProjects({ featured }) {
         </Box>
       </Container>
     </Box>
-  )
+  );
 }
 
 // About section with trust-building points.
@@ -217,7 +396,7 @@ function WhyChooseUs({ whyChooseUs }) {
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.05fr' }, gap: { xs: 5, md: 7 }, alignItems: 'center' }}>
           <Box>
             <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 12.5, fontWeight: 600, color: 'primary.main', mb: 1 }}>
-              {whyChooseUs.eyebrow}
+              <TypewriterText speed={50}>{whyChooseUs.eyebrow}</TypewriterText>
             </Typography>
             <Typography sx={{ mt: 1, color: 'text.secondary', fontSize: 16.5, maxWidth: 460 }}>
               {whyChooseUs.description}
@@ -416,7 +595,7 @@ function CallToAction({ cta }) {
 // Main page assembly. Copy comes from the admin-editable content document;
 // Navbar/Footer are provided by the shared Layout.
 export default function HomePage() {
-  const content = usePageContent(getHomeContent, homeContentData)
+  const content = usePageContent(HOME_PAGE_ID, homeContentData)
 
   return (
     <Box>

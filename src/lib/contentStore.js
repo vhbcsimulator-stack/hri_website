@@ -30,6 +30,9 @@ const mergeWithDefaults = (defaults, stored) => {
 
 const emptyDocument = () => ({ version: 1, updatedAt: null, pages: {} })
 
+// Exported for usePageContent, which applies it to the cached document.
+export { mergeWithDefaults }
+
 const readLocal = () => {
   try {
     const raw = localStorage.getItem(LS_KEY)
@@ -90,6 +93,10 @@ export const loadDocument = async () => {
   }
   return readLocal() || contentSnapshot || emptyDocument()
 }
+
+// Best copy available without touching the network — the placeholder the site
+// renders while the one live fetch is in flight.
+export const cachedDocument = () => readLocal() || contentSnapshot || emptyDocument()
 
 export const fetchPageContent = async (pageId, defaults) => {
   try {

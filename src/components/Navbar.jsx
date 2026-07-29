@@ -41,6 +41,13 @@ export default function Navbar() {
   
   const trigger = useScrollTrigger({threshold: 50, disableHysteresis: true});
 
+  const handleNavClick = (event, to, closeDrawer = false) => {
+    window.dispatchEvent(new Event('site-scroll-to-top'))
+    window.scrollTo({ top: 0, behavior: 'instant' })
+
+    if (pathname === to) event.preventDefault()
+    if (closeDrawer) setOpen(false)
+  }
 
   return (
     <>
@@ -68,11 +75,13 @@ export default function Navbar() {
               <Stack direction="row" spacing={4} sx={{ ml: 'auto' }}>
                 {NAV.map((n) => {
                   const active = n.to === pathname
+                    || (n.to === '/projects' && pathname === '/project-details')
                   return (
-                    <Typography
+                   <Typography
                       key={n.label}
                       component={RouterLink}
                       to={n.to}
+                      onClick={(event) => handleNavClick(event, n.to)}
                       sx={{
                         textAlign: 'center',
                         color: 'text.primary',
@@ -128,8 +137,8 @@ export default function Navbar() {
         </Box>
         <List>
           {NAV.map((n) => (
-            <ListItemButton key={n.label} component={RouterLink} to={n.to} onClick={() => setOpen(false)}
-              selected={n.to === pathname}>
+            <ListItemButton key={n.label} component={RouterLink} to={n.to} onClick={(event) => handleNavClick(event, n.to, true)}
+              selected={n.to === pathname || (n.to === '/projects' && pathname === '/project-details')}>
               <ListItemText primary={n.label} />
             </ListItemButton>
           ))}
