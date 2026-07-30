@@ -22,21 +22,6 @@ html {
   }
 }
 
-/* Chrome, Edge, Safari */
-::-webkit-scrollbar {
-  display: none;
-}
-
-/* Firefox */
-html {
-  scrollbar-width: none;
-}
-
-/* IE and older Edge */
-body {
-  -ms-overflow-style: none;
-}
-
 body {
   margin: 0;
   font-family: 'Poppins', system-ui, 'Segoe UI', Roboto, sans-serif;

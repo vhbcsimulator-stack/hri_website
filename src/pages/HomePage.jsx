@@ -19,13 +19,54 @@ import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
 import { HOME_PAGE_ID, homeContentData } from '../../shared/content/homeContent'
 
-// Hero banner section.
+// Small icon + title + copy unit, used by the hero highlight strip and the
+// dark band beneath it. `onDark` is always light-on-dark; the default is
+// responsive because the strip sits over the photo below md and on the light
+// field from md up.
+function HeroPoint({ item, onDark }) {
+  const icon = onDark ? '#a8ffa8' : { xs: '#a8ffa8', md: '#024A01' }
+  const title = onDark ? '#fff' : { xs: '#fff', md: '#0d1f0d' }
+  const copy = onDark ? 'rgba(255,255,255,.72)' : { xs: 'rgba(255,255,255,.8)', md: 'rgba(3,40,3,.68)' }
+  return (
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start', flex: 1, minWidth: 0 }}>
+      <MaterialSymbol name={item.icon} sx={{ fontSize: 26, color: icon, flexShrink: 0, mt: '2px' }} />
+      <Box sx={{ minWidth: 0 }}>
+        <Typography sx={{ fontWeight: 700, fontSize: 13.5, color: title }}>
+          {item.title}
+        </Typography>
+        <Typography sx={{ mt: 0.5, fontSize: 12.5, lineHeight: 1.5, color: copy }}>
+          {item.copy}
+        </Typography>
+      </Box>
+    </Stack>
+  )
+}
+
+// Width of the hero photo panel, and of the hairline arc that echoes it. Both
+// shapes are right-anchored, so width is what positions their left edge — the
+// two have to change together or the gap between the arcs drifts.
+const HERO_PANEL_WIDTH = { xs: '100%', md: '52%', lg: '60%' }
+const HERO_TRACE_WIDTH = { md: 'calc(52% + 34px)', lg: 'calc(60% + 34px)' }
+// The hero runs edge to edge rather than inside the theme's lg container, so
+// the copy can start near the viewport edge as the design does. These paddings
+// are the left inset of every row in the hero.
+const HERO_GUTTER = { xs: 3, sm: 5, md: 8, lg: 10 }
+
+// Hero banner section. Split layout: copy on a light field at left, photo
+// bleeding off the right edge behind a tall convex curve, an optional stat
+// card floating on the seam and an optional dark band across the base.
 function Hero({ hero }) {
   const bgRef = useRef(null)
   const contentRef = useRef(null)
+  const cardRef = useRef(null)
+  // Rendered only when the content document supplies them, so nothing shows
+  // as placeholder copy while these slots are still empty.
+  const highlights = hero.highlights || []
+  const bottomBar = hero.bottomBar || []
+  const statCard = hero.statCard
 
   // Scroll-driven parallax (matches the project-details hero): the image slowly
-  // zooms while the foreground content lifts faster, fades, and softly blurs —
+  // zooms while the foreground content lifts faster and fades —
   // giving the banner a layered sense of depth. Driven via rAF to avoid re-renders.
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -37,9 +78,12 @@ function Hero({ hero }) {
         if (bgRef.current) bgRef.current.style.transform = `scale(${1 + p * 0.35}) translateY(${p * 50}px)`
         if (contentRef.current) {
           contentRef.current.style.transform = `translateY(${p * -80}px)`
-          contentRef.current.style.opacity = String(1 - p * 1.3)
-          contentRef.current.style.filter = `blur(${p * 5}px)`
+          // contentRef.current.style.opacity = String(1 - p * 1.3)
         }
+        // if (cardRef.current) {
+        //   cardRef.current.style.boxShadow =
+        //     `0 ${8 + p * 24}px ${24 + p * 48}px rgba(0, 35, 0, ${0.08 + p * 0.24})`
+        // }
       })
     }
     onScroll()
@@ -54,36 +98,110 @@ function Hero({ hero }) {
         position: 'relative',
         minHeight: { xs: '88vh', md: '92vh' },
         display: 'flex',
-        alignItems: 'center',
-        color: '#fff',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        bgcolor: '#f7f7f3',
         overflow: 'hidden',
       }}
     >
-      <Box ref={bgRef} aria-hidden sx={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `url(${hero.image})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundColor: '#052905',
-        transformOrigin: 'center 55%',
-        willChange: 'transform',
+      {/* The photo panel. The curve lives on the wrapper so the parallax
+          scale/translate happens inside it and the arc stays put while the
+          image moves behind it. Below md there is no room for a split, so the
+          panel goes full-bleed and the copy sits over it. */}
+      <Box aria-hidden sx={{
+        position: 'absolute', top: 0, bottom: 0,
+        // Bleeds past the right edge from md so the panel reads as a slice of
+        // something larger instead of a shape pinned to the viewport.
+        right: { xs: 0, md: -48 },
+        width: HERO_PANEL_WIDTH,
+        overflow: 'hidden',
+        zIndex: 1,
+        // The first value is the arc's horizontal reach. Keep it well under
+        // 50%: at 46% the mid-height bulge reached far enough left to sit
+        // under the body copy.
+        borderRadius: { xs: 0, md: '34% 0 0 34% / 50% 0 0 50%' },
+        borderLeft: 10, borderColor: '#052905', borderStyle: 'solid',
+      }}>
+        <Box ref={bgRef} sx={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${hero.image})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor: '#052905',
+          transformOrigin: 'center 55%',
+          willChange: 'transform',
+        }} />
+        {/* Tint over the photo only — a sibling of the parallax layer, so the
+            curved wrapper clips it to exactly the photo's shape and it never
+            reaches the light side. Raise or lower the two alphas to taste. */}
+        <Box sx={{
+          position: 'absolute', inset: 0,
+          background: {
+            xs: 'linear-gradient(180deg, rgba(3,40,3,.55) 0%, rgba(2,20,2,.72) 100%)',
+            md: 'linear-gradient(180deg, rgba(3,40,3,.10) 0%, rgba(2,20,2,.26) 100%)',
+          },
+        }} />
+      </Box>
+      {/* Hairline arc echoing the photo curve. Same shape, but wider — it is
+          right-anchored, so the extra width is what pushes the visible edge
+          out onto the light field. Only the left border is drawn; the other
+          three are 0-width, which makes the browser paint the whole top-left
+          and bottom-left radius with the left border and gives one unbroken
+          arc rather than horizontal lines at the hero's top and bottom. */}
+      <Box aria-hidden sx={{
+        display: { xs: 'none', md: 'block' },
+        position: 'absolute', top: -24, bottom: -24, pointerEvents: 'none',
+        // Sits above the photo so the arc stays visible where the two shapes
+        // cross near the top and bottom; below the copy container.
+        zIndex: 2,
+        right: -48,
+        width: HERO_TRACE_WIDTH,
+        borderRadius: '34% 0 0 34% / 50% 0 0 50%',
+        borderStyle: 'solid',
+        borderColor: 'rgba(2,74,1,.28)',
+        borderWidth: '0 0 0 1.5px',
       }} />
       <Box aria-hidden sx={{
-        position: 'absolute', inset: 0,
-        background:
-          'radial-gradient(120% 90% at 70% 10%, rgba(0,0,255,.30), transparent 55%),' +
-          'linear-gradient(165deg, rgba(3,40,3,.72) 0%, rgba(2,20,2,.55) 45%, rgba(2,20,2,.9) 100%)',
+        display: { xs: 'none', md: 'block' },
+        position: 'absolute', top: -24, bottom: -24, pointerEvents: 'none',
+        // Sits above the photo so the arc stays visible where the two shapes
+        // cross near the top and bottom; below the copy container.
+        zIndex: 2,
+        right: -70,
+        width: HERO_TRACE_WIDTH,
+        borderRadius: '34% 0 0 34% / 50% 0 0 50%',
+        borderStyle: 'solid',
+        borderColor: 'rgba(2,74,1,.28)',
+        borderWidth: '0 0 0 1.5px',
       }} />
-      <Container ref={contentRef} sx={{ position: 'relative', zIndex: 2, py: { xs: 14, md: 16 }, willChange: 'transform, opacity, filter' }}>
-        <Box sx={{ maxWidth: 820 }}>
-          <Typography sx={{ textTransform: 'uppercase', letterSpacing: '4px', fontSize: 13, fontWeight: 500, color: '#b7f0b7', mb: 2 }}>
+      {/* Extra bottom padding from md so the copy clears the absolute band. */}
+      <Container maxWidth={false} ref={contentRef} sx={{
+        position: 'relative', zIndex: 2, willChange: 'transform',
+        px: HERO_GUTTER,
+        pt: { xs: 10, sm: 12, md: 14 },
+        pb: { xs: 10, sm: 12, md: bottomBar.length > 0 ? 20 : 14 },
+      }}>
+        <Box ref={cardRef} sx={{
+          // Percentage width, so the column always clears the curve's
+          // mid-height bulge instead of being nudged left by a fixed margin —
+          // that overflowed the viewport on narrow screens. The card styling is
+          // gone; the copy now sits directly on the light field.
+          maxWidth: { xs: '100%', md: '48%', lg: '46%' },
+          color: { xs: '#fff', md: 'inherit' },
+        }}>
+          <Typography sx={{ textTransform: 'uppercase', letterSpacing: { xs: '2.5px', md: '4px' }, fontSize: { xs: 11.5, md: 13 }, fontWeight: 500, color: 'inherit', mb: 2 }}>
             <TypewriterText speed={50}>{hero.eyebrow}</TypewriterText>
           </Typography>
-          <Typography variant="h1" sx={{ fontSize: { xs: 40, sm: 56, md: 78 } }}>
+          {/* 68px only from lg. At md (900px) the column is already narrow, so
+              a larger size overflows between 900px and roughly 1200px. */}
+          <Typography variant="h1" sx={{ fontSize: { xs: 32, sm: 44, md: 52, lg: 68 }, lineHeight: 1.08 }}>
             <Box component="span" sx={{ display: 'block', overflow: 'hidden', pb: '.08em', mb: '-.08em' }}>
               <Box
                 component="span"
                 sx={{
+                  // Below md the copy sits over the photo, where the brand
+                  // green and blue have no contrast.
+                  color: { xs: '#fff', md: '#024A01' },
                   display: 'block',
                   opacity: 0,
                   animation: 'heroTitleReveal 900ms cubic-bezier(.16, 1, .3, 1) 120ms forwards',
@@ -106,7 +224,7 @@ function Hero({ hero }) {
                 component="span"
                 sx={{
                   display: 'block',
-                  color: '#a8ffa8',
+                  color: { xs: '#a8ffa8', md: '#0000b4' },
                   fontWeight: 700,
                   opacity: 0,
                   animation: 'heroHighlightReveal 950ms cubic-bezier(.16, 1, .3, 1) 340ms forwards',
@@ -125,29 +243,119 @@ function Hero({ hero }) {
               </Box>
             </Box>
           </Typography>
-          <Typography sx={{ mt: 3, maxWidth: 640, fontSize: { xs: 16, md: 19 }, fontWeight: 300, color: 'rgba(255,255,255,.9)' }}>
+          {/* Rule-and-dot separating the title from the supporting copy. */}
+          <Stack direction="row" spacing={1} aria-hidden sx={{ mt: { xs: 2.5, md: 3.5 }, alignItems: 'center' }}>
+            <Box sx={{ width: 84, height: 3, bgcolor: { xs: '#a8ffa8', md: '#024A01' } }} />
+            <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: { xs: '#a8ffa8', md: '#024A01' } }} />
+          </Stack>
+          <Typography sx={{ mt: { xs: 2, md: 3 }, maxWidth: 560, fontSize: { xs: 15, sm: 16, md: 16.5 }, fontWeight: 300, lineHeight: 1.7, color: { xs: 'rgba(255,255,255,.9)', md: '#3a463a' } }}>
             {hero.subtitle}
           </Typography>
-          <Stack direction="row" spacing={1.75} sx={{ mt: 4.5, flexWrap: 'wrap', gap: 1.5 }}>
-            <Button variant="contained" color="secondary" component={RouterLink} to="/projects" size="large">
+          {/* Full-width stacked buttons on phones — side by side they drop to
+              roughly 140px each and the labels wrap. */}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={0}
+            sx={{ mt: { xs: 3, md: 4 }, flexWrap: 'wrap', gap: 1.5, alignItems: { xs: 'stretch', sm: 'center' } }}
+          >
+            <Button variant="contained" color="secondary" component={RouterLink} to="/projects" size="large"
+              endIcon={<ArrowForwardIcon />}
+              sx={{ width: { xs: '100%', sm: 'auto' }, borderRadius: 999, px: 3.5 }}>
               {hero.primaryCta}
             </Button>
             <Button variant="outlined" component={RouterLink} to="/about" size="large"
-              sx={{ color: '#fff', borderColor: 'rgba(255,255,255,.6)', '&:hover': { borderColor: '#fff', bgcolor: 'rgba(255,255,255,.12)' } }}>
+              endIcon={<ArrowForwardIcon />}
+              sx={{
+                width: { xs: '100%', sm: 'auto' }, borderRadius: 999, px: 3.5,
+                color: { xs: '#fff', md: '#032803' },
+                bgcolor: { xs: 'transparent', md: '#fff' },
+                borderColor: { xs: 'rgba(255,255,255,.7)', md: 'rgba(3,40,3,.25)' },
+                '&:hover': { borderColor: { xs: '#fff', md: '#032803' }, bgcolor: 'rgba(3,40,3,.12)' },
+              }}>
               {hero.secondaryCta}
             </Button>
           </Stack>
+          {/* Highlight strip: hairline-divided columns under the buttons. */}
+          {highlights.length > 0 && (
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              divider={<Box sx={{ alignSelf: 'stretch', width: { sm: '1px' }, height: { xs: '1px', sm: 'auto' }, bgcolor: { xs: 'rgba(255,255,255,.25)', md: 'rgba(3,40,3,.15)' } }} />}
+              spacing={2.5}
+              sx={{ mt: { xs: 4, md: 6 }, maxWidth: 640 }}
+            >
+              {highlights.map((h) => <HeroPoint key={h.title} item={h} />)}
+            </Stack>
+          )}
         </Box>
       </Container>
-      <IconButton href="#projects" 
+      {/* Stat card floating on the photo, just inside the curve. Only from md —
+          on phones the photo is the copy's backdrop and there is no clear
+          space for it. */}
+      {statCard && (
+        <Card elevation={0} sx={{
+          display: { xs: 'none', md: 'block' },
+          position: 'absolute', zIndex: 3,
+          right: { md: '9%', lg: '13%' }, bottom: { md: '9%' },
+          width: 262, p: 3, borderRadius: 2,
+          bgcolor: 'rgba(255,255,255,.96)',
+          boxShadow: '0 24px 60px -24px rgba(2,40,2,.45)',
+        }}>
+          <Avatar variant="rounded" sx={{ bgcolor: 'secondary.main', width: 46, height: 46, borderRadius: '50%', mb: 2 }}>
+            <MaterialSymbol name={statCard.icon} />
+          </Avatar>
+          <Typography sx={{ fontSize: 34, fontWeight: 800, lineHeight: 1.1, color: '#0d1f0d' }}>
+            {statCard.value}
+          </Typography>
+          <Typography sx={{ mt: 0.5, fontWeight: 700, fontSize: 14.5, color: '#0d1f0d' }}>
+            {statCard.label}
+          </Typography>
+          <Typography sx={{ mt: 1.25, fontSize: 12.5, lineHeight: 1.6, color: 'rgba(3,40,3,.68)' }}>
+            {statCard.copy}
+          </Typography>
+        </Card>
+      )}
+      {/* Scroll cue. It lands on the seam between the light field and the
+          photo, so it needs to read against both: a solid white pill carries
+          the green icon over either one. zIndex clears the arc (2) and the copy
+          container (2); when the dark band is present it lifts to sit above it. */}
+      <IconButton
+        href="#projects"
+        aria-label="Scroll to featured projects"
         sx={{
-          position: 'absolute', bottom: 26, left: '50%', transform: 'translateX(-50%)', zIndex: 2,
-          color: '#fff', border: '1.5px solid rgba(255,255,255,.5)',
+          // Hidden on phones, where the copy spans the full width and the
+          // chevron would land on top of it rather than in open space.
+          display: { xs: 'none', sm: 'inline-flex' },
+          position: 'absolute', zIndex: 5,
+          bottom: bottomBar.length > 0 ? { xs: 26, md: 104 } : 26,
+          left: '50%', transform: 'translateX(-50%)',
+          color: '#024A01',
+          bgcolor: '#fff',
+          border: '1.5px solid #024A01',
+          boxShadow: '0 6px 18px -6px rgba(2,40,2,.45)',
           animation: 'bob 2s ease-in-out infinite',
           '@keyframes bob': { '0%,100%': { transform: 'translate(-50%,0)' }, '50%': { transform: 'translate(-50%,8px)' } },
+          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+          '&:hover': { bgcolor: '#024A01', color: '#fff' },
         }}>
         <KeyboardArrowDownIcon />
       </IconButton>
+      {/* Dark band across the base of the hero, running under the photo curve. */}
+      {bottomBar.length > 0 && (
+        <Box sx={{
+          position: { xs: 'static', md: 'absolute' }, left: 0, right: 0, bottom: 0, zIndex: 4,
+          bgcolor: '#0d3b0d', py: { xs: 3, md: 2.75 },
+        }}>
+          <Container maxWidth={false} sx={{ px: HERO_GUTTER }}>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              divider={<Box sx={{ alignSelf: 'stretch', width: { sm: '1px' }, height: { xs: '1px', sm: 'auto' }, bgcolor: 'rgba(255,255,255,.2)' }} />}
+              spacing={2.5}
+            >
+              {bottomBar.map((b) => <HeroPoint key={b.title} item={b} onDark />)}
+            </Stack>
+          </Container>
+        </Box>
+      )}
     </Box>
   )
 }

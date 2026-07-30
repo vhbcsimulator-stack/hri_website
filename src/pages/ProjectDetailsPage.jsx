@@ -34,7 +34,7 @@ export default function ProjectDetailsPage() {
   const contentRef = useRef(null)
 
   // Scroll-driven parallax: the hero image slowly zooms while the foreground
-  // content lifts faster, fades, and softly blurs. Driven via rAF to avoid re-renders.
+  // content lifts faster and fades. Driven via rAF to avoid re-renders.
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     let raf = 0
@@ -46,7 +46,6 @@ export default function ProjectDetailsPage() {
         if (contentRef.current) {
           contentRef.current.style.transform = `translateY(${p * -80}px)`
           contentRef.current.style.opacity = String(1 - p * 1.3)
-          contentRef.current.style.filter = `blur(${p * 5}px)`
         }
       })
     }
