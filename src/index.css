@@ -1,4 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+/* Two families: Cormorant Garamond for headlines, Manrope for everything else.
+   MUI's theme (styles/theme.js) is the real source of truth for component text —
+   its emotion classes beat these element selectors — so the two must be changed
+   together. These rules cover the plain HTML outside MUI. */
+:root {
+  font-family: 'Manrope', system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+h1,
+h2,
+.heading-font {
+  font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+}
 
 * {
   box-sizing: border-box;
@@ -24,7 +38,7 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Poppins', system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Manrope', system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -186,7 +186,7 @@ function Hero({ hero }) {
           // mid-height bulge instead of being nudged left by a fixed margin —
           // that overflowed the viewport on narrow screens. The card styling is
           // gone; the copy now sits directly on the light field.
-          maxWidth: { xs: '100%', md: '48%', lg: '46%' },
+          maxWidth: { xs: '100%', md: '48%', lg: '40%' },
           color: { xs: '#fff', md: 'inherit' },
         }}>
           <Typography sx={{ textTransform: 'uppercase', letterSpacing: { xs: '2.5px', md: '4px' }, fontSize: { xs: 11.5, md: 13 }, fontWeight: 500, color: 'inherit', mb: 2 }}>

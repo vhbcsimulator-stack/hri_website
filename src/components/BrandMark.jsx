@@ -9,13 +9,14 @@ export default function BrandMark({ light = false }) {
         src={logo}
         alt="Hermosa Residences Inc."
         sx={{
-          height: { xs: 60, md: 90 },
+          height: { xs: 25, md: 45 },
           width: 'auto',
           display: 'block',
           ...(light && {
             bgcolor: '#fff',
             px: 1,
             py: 0.5,
+            pb: 100
           }),
         }}
       />

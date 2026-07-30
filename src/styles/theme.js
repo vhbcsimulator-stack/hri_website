@@ -6,6 +6,9 @@ const GREEN_DARK = '#032803'
 const BLUE = '#0000FF'
 const INK = '#0d1f0d'
 const BUTTON = '#024A01' // primary button colour
+// Cormorant Garamond carries the property headlines; Manrope carries the UI.
+const HEADING_FONT = '"Cormorant Garamond", "Times New Roman", serif'
+const BODY_FONT = '"Manrope", system-ui, "Segoe UI", Roboto, sans-serif'
 const BUTTON_HOVER = '#013600'
 
 const theme = createTheme({
@@ -24,9 +27,14 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Poppins", system-ui, "Segoe UI", Roboto, sans-serif',
-    h1: { fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.02 },
-    h2: { fontWeight: 700, letterSpacing: '-0.5px', textTransform: 'uppercase' },
+    fontFamily: BODY_FONT,
+    // Only h1/h2 take the serif — the display sizes it was chosen for. h3 and
+    // h4 are small uppercase labels in this design, where Cormorant's low
+    // contrast and tight x-height read as blurry rather than elegant.
+    // Weights are limited to what index.css loads (500/600/700), so nothing
+    // here asks for a weight the browser would have to synthesise.
+    h1: { fontFamily: HEADING_FONT, fontWeight: 600, letterSpacing: '-0.03em', lineHeight: 0.95 },
+    h2: { fontFamily: HEADING_FONT, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.05, textTransform: 'uppercase' },
     h3: { fontWeight: 700 },
     h4: { fontWeight: 600 },
     button: { fontWeight: 600, textTransform: 'none', letterSpacing: '0.2px' },

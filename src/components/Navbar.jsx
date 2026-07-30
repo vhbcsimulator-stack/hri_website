@@ -69,8 +69,8 @@ export default function Navbar() {
 
       >
         <Container>
-          <Toolbar disableGutters sx={{ minHeight: { xs: 68, md: 76 }, gap: 2, }}>
-            <BrandMark />
+          <Toolbar disableGutters sx={{ minHeight: { xs: 78, md: 86 }, gap: 2, }}>
+            <BrandMark sx={{ mb: 100 }} />
             {!isMobile && (
               <Stack direction="row" spacing={4} sx={{ ml: 'auto' }}>
                 {NAV.map((n) => {
