@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "dev:admin": "npm --prefix admin run dev",
-    "build:admin": "npm --prefix admin run build"
+    "build:admin": "npm --prefix admin run build",
+    "pull:content": "node admin/scripts/pull-content.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
