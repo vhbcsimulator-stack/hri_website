@@ -111,7 +111,7 @@ export default function AboutPage() {
                 '&:hover': { transform: 'translateY(-6px)', bgcolor: '#fff', borderColor: 'secondary.main', },
                 '&:hover .valueIcon': { transform: 'scale(1.12)' },
               }}>
-                <Box className="valueIcon" sx={{ color: 'secondary.main', mb: 2, transition: 'transform .28s ease' }}>
+                <Box className="valueIcon" sx={{ color: 'GREEN', mb: 2, transition: 'transform .28s ease' }}>
                   <MaterialSymbol name={v.icon} sx={{ fontSize: 34 }} />
                 </Box>
                 <Typography sx={{ fontWeight: 700, fontSize: 15, textTransform: 'uppercase', letterSpacing: '.4px', color: 'primary.dark', mb: 1.25 }}>
