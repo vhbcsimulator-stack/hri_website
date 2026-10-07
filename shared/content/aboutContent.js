@@ -28,10 +28,32 @@ export const aboutContentData = {
       { icon: 'verified_user', title: 'Professionalism', copy: 'We conduct our work with competence, respect, and dedication, ensuring every client receives the attention they deserve.' },
     ],
   },
+  // Each card's `body` is rich-text HTML from the admin's Quill editor
+  // (paragraphs, bold/italic/underline, lists, links). Render it through
+  // missionVisionBodyHtml() + a sanitizer, never directly.
   missionVision: {
     items: [
-      { icon: 'track_changes', title: 'Mission', copy: 'To guide clients toward property opportunities with clarity, integrity, and attentive service — helping them make confident decisions and create lasting value.', tags: 'Service / Transparency / Confidence' },
-      { icon: 'visibility', title: 'Vision', copy: 'To become a trusted Philippine real estate brand known for beautiful places, responsible growth, and relationships that endure.', tags: 'Trust / Growth / Opportunity' },
+      {
+        icon: 'visibility',
+        title: 'Vision',
+        body:
+          '<p>To be a trusted and transformative housing developer that helps bridge the housing gap in the Philippines by making safe, quality, and affordable homes accessible to every Filipino family.</p>'
+          + '<p>We envision thriving communities where homeownership is not merely a dream, but an achievable foundation for security, dignity, stability, and a better future.</p>',
+      },
+      {
+        icon: 'track_changes',
+        title: 'Mission',
+        body:
+          "<p>Hermosa Residence Inc. is committed to helping address the country's housing backlog through the development of affordable, quality, and sustainable socialized and economic housing communities.</p>"
+          + '<p><strong>We aim to:</strong></p>'
+          + '<ul>'
+          + '<li>Make homeownership more accessible and attainable for Filipino families, particularly low- to middle-income households.</li>'
+          + '<li>Develop socialized and economic housing projects that balance affordability, quality, functionality, and long-term value.</li>'
+          + '<li>Build safe, well-planned, and sustainable communities where families can live, grow, and prosper.</li>'
+          + '<li>Establish responsible partnerships with government agencies, financial institutions, landowners, contractors, and communities to expand housing opportunities.</li>'
+          + '<li>Conduct our business with integrity, accountability, excellence, and genuine concern for the families we serve.</li>'
+          + '</ul>',
+      },
     ],
   },
   whatWeDo: {
@@ -68,6 +90,31 @@ export const aboutContentData = {
   },
 }
 
-export const getAboutContent = () => fetchPageContent(ABOUT_PAGE_ID, aboutContentData)
+const escapeHtml = (text) => String(text)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+// A Mission/Vision card's body as HTML. Cards saved before the rich-text editor
+// carry plain `copy`, or `paragraphs` + `listIntro` + `points`; those are
+// converted (escaped) so older Supabase rows keep rendering.
+export const missionVisionBodyHtml = (item) => {
+  if (typeof item?.body === 'string') return item.body
+  const paragraphs = item?.paragraphs ?? (item?.copy ? [item.copy] : [])
+  let html = paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('')
+  if (item?.listIntro) html += `<p><strong>${escapeHtml(item.listIntro)}</strong></p>`
+  if (item?.points?.length) html += `<ul>${item.points.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
+  return html
+}
+
+// Desktop column template for the Mission/Vision row. With two cards, the one
+// with more text gets a wider column (up to 3:2), so the longer card isn't
+// tall and narrow next to a mostly empty short one. Any other count: even grid.
+export const missionVisionColumns = (items = []) => {
+  if (items.length !== 2) return 'repeat(2, 1fr)'
+  const lengths = items.map((item) => missionVisionBodyHtml(item).replace(/<[^>]+>/g, '').length || 1)
+  const ratio = Math.min(1.5, Math.max(1 / 1.5, lengths[0] / lengths[1]))
+  return ratio >= 1 ? `${ratio}fr 1fr` : `1fr ${1 / ratio}fr`
+}
+
+export const getAboutContent =() => fetchPageContent(ABOUT_PAGE_ID, aboutContentData)
 
 export const saveAboutContent = (content) => persistPageContent(ABOUT_PAGE_ID, content)

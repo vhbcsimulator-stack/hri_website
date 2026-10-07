@@ -118,16 +118,14 @@
       "missionVision": {
         "items": [
           {
-            "copy": "To guide clients toward property opportunities with clarity, integrity, and attentive service — helping them make confident decisions and create lasting value.",
-            "icon": "track_changes",
-            "tags": "Service / Transparency / Confidence",
-            "title": "Mission"
+            "body": "<p>To be a trusted and transformative housing developer that helps bridge the housing gap in the Philippines by making safe, quality, and affordable homes accessible to every Filipino family.</p><p>We envision thriving communities where homeownership is not merely a dream, but an achievable foundation for security, dignity, stability, and a better future.</p>",
+            "icon": "visibility",
+            "title": "Vision"
           },
           {
-            "copy": "To become a trusted Philippine real estate brand known for beautiful places, responsible growth, and relationships that endure.",
-            "icon": "visibility",
-            "tags": "Trust / Growth / Opportunity",
-            "title": "Vision"
+            "body": "<p>Hermosa Residence Inc. is committed to helping address the country's housing backlog through the development of affordable, quality, and sustainable socialized and economic housing communities.</p><p><strong>We aim to:</strong></p><ul><li>Make homeownership more accessible and attainable for Filipino families, particularly low- to middle-income households.</li><li>Develop socialized and economic housing projects that balance affordability, quality, functionality, and long-term value.</li><li>Build safe, well-planned, and sustainable communities where families can live, grow, and prosper.</li><li>Establish responsible partnerships with government agencies, financial institutions, landowners, contractors, and communities to expand housing opportunities.</li><li>Conduct our business with integrity, accountability, excellence, and genuine concern for the families we serve.</li></ul>",
+            "icon": "track_changes",
+            "title": "Mission"
           }
         ]
       }

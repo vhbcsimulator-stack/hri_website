@@ -3,13 +3,18 @@ import PageBanner from '../components/PageBanner'
 import ContentBlocks from '../components/ContentBlocks'
 import usePageContent from '../hooks/usePageContent'
 import { SITEMAP_PAGE_ID, sitemapContentData, normalizeSitemapContent } from '../../shared/content/sitemapContent'
+import RichParagraph from '../../shared/content/RichParagraph'
+import PageSection from '../components/PageSection'
+import { getLayout } from '../../shared/content/pageLayout'
 
 export default function SitemapPage() {
   // Normalised so groups saved before the block model still render.
   const content = normalizeSitemapContent(usePageContent(SITEMAP_PAGE_ID, sitemapContentData))
+  const layout = getLayout(content, 'sitemap')
 
   return (
     <Box>
+      <PageSection id="banner" layout={layout}>
       <PageBanner
         eyebrow={content.eyebrow}
         title={content.title}
@@ -17,14 +22,15 @@ export default function SitemapPage() {
         paragraphs={content.heroParagraphs}
         crumbs={[{ label: content.title }]}
       />
+      </PageSection>
+
+      <PageSection id="body" layout={layout}>
       <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: 'brand.surface' }}>
         <Container maxWidth="md">
           {/* Single document card with divider-separated sections, matching the
               legal pages. */}
           <Box sx={{ bgcolor: '#fff', border: '1px solid', borderColor: 'brand.line', borderRadius: 3, p: { xs: 3, sm: 5, md: 7 } }}>
-            <Typography sx={{ color: 'text.secondary', fontSize: 15.5, lineHeight: 1.9, mb: 4 }}>
-              {content.intro}
-            </Typography>
+            <RichParagraph value={content.intro} sx={{ color: 'text.secondary', fontSize: 15.5, lineHeight: 1.9, mb: 4 }} />
             {content.groups.map((group, gi) => (
               <Box component="section" key={gi}>
                 {gi > 0 && <Divider sx={{ my: { xs: 3.5, md: 4.5 }, borderColor: 'brand.line' }} />}
@@ -38,6 +44,7 @@ export default function SitemapPage() {
           </Box>
         </Container>
       </Box>
+      </PageSection>
     </Box>
   )
 }

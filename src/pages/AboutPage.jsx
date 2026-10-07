@@ -5,7 +5,11 @@ import HeroTitleReveal from '../components/HeroTitleReveal'
 import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { ABOUT_PAGE_ID, aboutContentData } from '../../shared/content/aboutContent'
+import { ABOUT_PAGE_ID, aboutContentData, missionVisionBodyHtml, missionVisionColumns } from '../../shared/content/aboutContent'
+import { sanitizeRichText, richTextSx } from '../../shared/content/richText'
+import RichParagraph from '../../shared/content/RichParagraph'
+import PageSection from '../components/PageSection'
+import { getLayout } from '../../shared/content/pageLayout'
 
 // Brand accent: interlocking blue/green rings used above section titles.
 function BrandCircles({ size = 52 }) {
@@ -36,8 +40,10 @@ export default function AboutPage() {
   const content = usePageContent(ABOUT_PAGE_ID, aboutContentData)
   const { hero, coreValues, missionVision, whatWeDo, whyChoose, cta } = content
 
+  const layout = getLayout(content, 'about')
   return (
     <Box>
+      <PageSection id="hero" layout={layout}>
       {/* Hero */}
       <Box component="section" sx={{ pt: { xs: 13, md: 17 }, pb: { xs: 7, md: 11 }, position: 'relative', overflow: 'hidden' }}>
         {/* soft brand backdrop */}
@@ -58,12 +64,8 @@ export default function AboutPage() {
                   <Box component="span" sx={{ color: 'primary.main' }}>{hero.titleHighlight}</Box>
                 </HeroTitleReveal>
               </Typography>
-              <Typography sx={{ color: 'text.secondary', fontSize: 16, mb: 2.5 }}>
-                {hero.para1}
-              </Typography>
-              <Typography sx={{ color: 'text.secondary', fontSize: 16, mb: 4 }}>
-                {hero.para2}
-              </Typography>
+              <RichParagraph value={hero.para1} sx={{ color: 'text.secondary', fontSize: 16, mb: 2.5 }} />
+              <RichParagraph value={hero.para2} sx={{ color: 'text.secondary', fontSize: 16, mb: 4 }} />
 
               <Stack direction="row" spacing={1.75} sx={{ flexWrap: 'wrap', gap: 1.5, mb: 5 }}>
                 <Button variant="contained" color="primary" size="large" component={RouterLink} to="/projects">
@@ -96,7 +98,9 @@ export default function AboutPage() {
           </Box>
         </Container>
       </Box>
+      </PageSection>
 
+      <PageSection id="coreValues" layout={layout}>
       {/* Core Values */}
       <Reveal variant="up">
       <Box component="section" sx={{ py: { xs: 7, md: 10 } }}>
@@ -117,22 +121,24 @@ export default function AboutPage() {
                 <Typography sx={{ fontWeight: 700, fontSize: 15, textTransform: 'uppercase', letterSpacing: '.4px', color: 'primary.dark', mb: 1.25 }}>
                   {v.title}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: 'text.secondary', lineHeight: 1.55 }}>{v.copy}</Typography>
+                <RichParagraph value={v.copy} sx={{ fontSize: 13, color: 'text.secondary', lineHeight: 1.55 }} />
               </Box>
             ))}
           </Box>
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="missionVision" layout={layout}>
       {/* Mission / Vision */}
       <Reveal variant="zoom">
       <Box component="section" sx={{ py: { xs: 6, md: 9 } }}>
         <Container>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: { xs: 6, md: 8 }, textAlign: 'center' }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: missionVisionColumns(missionVision.items) }, gap: { xs: 3, md: 4 }, textAlign: 'center' }}>
             {missionVision.items.map((m, i) => (
               <Box key={i} sx={{
-                bgcolor: '#fff', borderRadius: 3, p: { xs: 4, md: 5 }, cursor: 'default',
+                bgcolor: '#fff', borderRadius: 3, px: { xs: 3, sm: 4, md: 6 }, py: { xs: 4, md: 6 }, cursor: 'default',
                 border: '1px solid', borderColor: 'brand.line',
                 transition: 'transform .35s cubic-bezier(.2,.7,.2,1),  .35s ease, border-color .35s ease',
                 '&:hover': { transform: 'translateY(-6px)', borderColor: 'rgba(0,102,0,.25)' },
@@ -140,32 +146,34 @@ export default function AboutPage() {
                 '&:hover .mvRule': { width: 56 },
               }}>
                 <Box className="mvBadge" sx={{
-                  width: 72, height: 72, mx: 'auto', mb: 2.5, borderRadius: '50%',
+                  width: 68, height: 68, mx: 'auto', mb: 2, borderRadius: '50%',
                   bgcolor: 'rgba(0,102,0,.08)', color: 'primary.main',
                   display: 'grid', placeItems: 'center',
                   transition: 'background-color .35s ease, color .35s ease,  .35s ease',
                 }}>
                   <MaterialSymbol name={m.icon} sx={{ fontSize: 36 }} />
                 </Box>
-                <Typography variant="h2" sx={{ color: 'primary.main', fontSize: { xs: 26, md: 32 }, mb: 1.5 }}>{m.title}</Typography>
-                <Box className="mvRule" sx={{ height: 3, width: 32, borderRadius: 2, bgcolor: 'primary.main', mx: 'auto', mb: 2.5, transition: 'width .35s ease' }} />
-                <Typography sx={{ color: 'text.secondary', fontSize: 16, maxWidth: 460, mx: 'auto', mb: 2.5 }}>{m.copy}</Typography>
-                <Typography sx={{ color: 'text.secondary', fontWeight: 600, letterSpacing: '.5px', fontSize: 14.5 }}>{m.tags}</Typography>
+                <Typography variant="h2" sx={{ color: 'primary.main', fontSize: { xs: 26, md: 32 }, mb: 1.25 }}>{m.title}</Typography>
+                <Box className="mvRule" sx={{ height: 3, width: 32, borderRadius: 2, bgcolor: 'primary.main', mx: 'auto', mb: { xs: 3, md: 4 }, transition: 'width .35s ease' }} />
+                <Box
+                  sx={{ ...richTextSx, textAlign: 'left' }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichText(missionVisionBodyHtml(m)) }}
+                />
               </Box>
             ))}
           </Box>
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="whatWeDo" layout={layout}>
       {/* What We Do */}
       <Reveal variant="right">
       <Box component="section" sx={{ py: { xs: 8, md: 11 }, bgcolor: 'brand.surface' }}>
         <Container>
           <SectionTitle icon={<BrandCircles size={56} />}>{whatWeDo.title}</SectionTitle>
-          <Typography sx={{ textAlign: 'center', color: 'text.secondary', fontSize: 15.5, maxWidth: 780, mx: 'auto', mb: 6 }}>
-            {whatWeDo.description}
-          </Typography>
+          <RichParagraph value={whatWeDo.description} sx={{ textAlign: 'center', color: 'text.secondary', fontSize: 15.5, maxWidth: 780, mx: 'auto', mb: 6 }} />
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(5, 1fr)' }, gap: 2.5 }}>
             {whatWeDo.items.map((item, i) => (
               <Box key={i} tabIndex={0} sx={{
@@ -208,7 +216,9 @@ export default function AboutPage() {
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="whyChoose" layout={layout}>
       {/* Why Choose Us */}
       <Reveal variant="left">
       <Box component="section" sx={{ py: { xs: 8, md: 12, bgcolor: 'brand.line' } }}>
@@ -217,9 +227,7 @@ export default function AboutPage() {
             <Typography variant="h2" sx={{ color: 'primary.main', fontSize: { xs: 30, md: 42 } }}>
               {whyChoose.title}
             </Typography>
-            <Typography sx={{ color: 'text.secondary', fontSize: 16.5 }}>
-              {whyChoose.description}
-            </Typography>
+            <RichParagraph value={whyChoose.description} sx={{ color: 'text.secondary', fontSize: 16.5 }} />
           </Box>
 
           <Box sx={{ position: 'relative' }}>
@@ -243,7 +251,7 @@ export default function AboutPage() {
                     {w.n}
                   </Box>
                   <Typography className="stepTitle" sx={{ fontWeight: 600, fontSize: 14, color: 'primary.dark', mb: 1, transition: 'color .25s ease' }}>{w.title}</Typography>
-                  <Typography sx={{ fontSize: 12.5, color: 'text.secondary', lineHeight: 1.5 }}>{w.copy}</Typography>
+                  <RichParagraph value={w.copy} sx={{ fontSize: 12.5, color: 'text.secondary', lineHeight: 1.5 }} />
                 </Box>
               ))}
             </Box>
@@ -251,7 +259,9 @@ export default function AboutPage() {
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="cta" layout={layout}>
       {/* CTA */}
       <Reveal variant="zoom-up">
       <Box component="section" sx={{
@@ -262,9 +272,7 @@ export default function AboutPage() {
           <Typography variant="h2" sx={{ color: '#fff', textTransform: 'none', fontSize: { xs: 24, md: 34 }, fontWeight: 700, mb: 2 }}>
             {cta.title}
           </Typography>
-          <Typography sx={{ color: 'rgba(255,255,255,.85)', fontSize: 15.5, fontWeight: 300, maxWidth: 620, mx: 'auto', mb: 4 }}>
-            {cta.text}
-          </Typography>
+          <RichParagraph value={cta.text} sx={{ color: 'rgba(255,255,255,.85)', fontSize: 15.5, fontWeight: 300, maxWidth: 620, mx: 'auto', mb: 4 }} />
           <Button
             variant="outlined" size="large" component={RouterLink} to="/contact"
             sx={{ color: '#fff', borderColor: 'rgba(255,255,255,.7)', '&:hover': { borderColor: '#fff', bgcolor: 'rgba(255,255,255,.12)' } }}
@@ -274,6 +282,7 @@ export default function AboutPage() {
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
     </Box>
   )
 }

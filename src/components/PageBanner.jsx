@@ -2,6 +2,7 @@ import { Box, Container, Typography, Breadcrumbs, Link as MuiLink } from '@mui/m
 import { Link as RouterLink } from 'react-router-dom'
 import HeroTitleReveal from './HeroTitleReveal'
 import TypewriterText from './TypewriterText'
+import RichParagraph from '../../shared/content/RichParagraph'
 
 // Compact page header used on interior pages. Sits under the fixed navbar
 // with a dark green gradient (optionally over a background image) so the
@@ -44,14 +45,10 @@ export default function PageBanner({ eyebrow, title, subtitle, paragraphs = [], 
           <HeroTitleReveal>{title}</HeroTitleReveal>
         </Typography>
         {subtitle && (
-          <Typography sx={{ mt: 2, maxWidth: 620, fontSize: { xs: 15, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.85)' }}>
-            {subtitle}
-          </Typography>
+          <RichParagraph value={subtitle} sx={{ mt: 2, maxWidth: 620, fontSize: { xs: 15, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.85)' }} />
         )}
         {paragraphs.filter(Boolean).map((text, index) => (
-          <Typography key={index} sx={{ mt: 2, maxWidth: 620, fontSize: { xs: 14.5, md: 16 }, fontWeight: 300, color: 'rgba(255,255,255,.78)' }}>
-            {text}
-          </Typography>
+          <RichParagraph value={text} key={index} sx={{ mt: 2, maxWidth: 620, fontSize: { xs: 14.5, md: 16 }, fontWeight: 300, color: 'rgba(255,255,255,.78)' }} />
         ))}
         <Breadcrumbs sx={{ mt: 3, color: 'rgba(255,255,255,.7)', fontSize: 13.5, '& a': { color: 'rgba(255,255,255,.7)' } }}>
           <MuiLink component={RouterLink} to="/" underline="hover">Home</MuiLink>

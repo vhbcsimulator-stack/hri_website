@@ -20,6 +20,8 @@ import CloseIcon from '@mui/icons-material/Close'
 import BrandMark from './BrandMark'
 import SpecialistModal from './SpecialistModal'
 import useScrollTrigger from '@mui/material/useScrollTrigger';
+import useSiteSettings from '../hooks/useSiteSettings'
+import { isNavPathHidden } from '../../shared/content/pageLayout'
 
 // Top navigation links (route paths).
 const NAV = [
@@ -35,6 +37,9 @@ export default function Navbar() {
   const [modalOpen, setModalOpen] = useState(false)
   const isMobile = useMediaQuery((t) => t.breakpoints.down('md'))
   const { pathname } = useLocation()
+  // Buttons the admin removed from the menu, or whose page is offline, drop out.
+  const settings = useSiteSettings()
+  const nav = NAV.filter((n) => !isNavPathHidden(settings, n.to))
 
   // The specialist CTA is redundant on the Contact page, so hide it there.
   const showSpecialistCta = pathname !== '/contact'
@@ -73,7 +78,7 @@ export default function Navbar() {
             <BrandMark sx={{ mb: 100 }} />
             {!isMobile && (
               <Stack direction="row" spacing={4} sx={{ ml: 'auto' }}>
-                {NAV.map((n) => {
+                {nav.map((n) => {
                   const active = n.to === pathname
                     || (n.to === '/projects' && pathname === '/project-details')
                   return (
@@ -136,7 +141,7 @@ export default function Navbar() {
           <IconButton onClick={() => setOpen(false)}><CloseIcon /></IconButton>
         </Box>
         <List>
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <ListItemButton key={n.label} component={RouterLink} to={n.to} onClick={(event) => handleNavClick(event, n.to, true)}
               selected={n.to === pathname || (n.to === '/projects' && pathname === '/project-details')}>
               <ListItemText primary={n.label} />

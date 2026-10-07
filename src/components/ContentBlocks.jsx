@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { BULLETS } from '../../shared/content/blocks'
+import RichParagraph from '../../shared/content/RichParagraph'
 
 // Body type shared by paragraphs and bullets, matching the legal pages.
 const bodySx = { color: 'text.secondary', fontSize: 15.5, lineHeight: 1.9 }
@@ -21,9 +22,7 @@ export default function ContentBlocks({ blocks }) {
         ))}
       </Box>
     ) : (
-      <Typography key={index} sx={{ ...bodySx, mt: index > 0 ? 2 : 0 }}>
-        {block.text}
-      </Typography>
+      <RichParagraph value={block.text} key={index} sx={{ ...bodySx, mt: index > 0 ? 2 : 0 }} />
     )
   ))
 }

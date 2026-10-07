@@ -3,16 +3,20 @@ import PageBanner from '../components/PageBanner'
 import ContentBlocks from '../components/ContentBlocks'
 import usePageContent from '../hooks/usePageContent'
 import { LEGAL_PAGE_ID, legalContentData, normalizeLegalDoc } from '../../shared/content/legalContent'
+import PageSection from '../components/PageSection'
+import { getLayout, LEGAL_LAYOUT_KEYS } from '../../shared/content/pageLayout'
 
 // Renders whichever legal document matches `type` (privacy | terms | cookies).
 // Copy comes from the admin-editable content document.
 export default function LegalPage({ type }) {
   const content = usePageContent(LEGAL_PAGE_ID, legalContentData)
+  const layout = getLayout(content, LEGAL_LAYOUT_KEYS[type])
   // Normalised so sections saved before the block model still render.
   const page = normalizeLegalDoc(content[type] || legalContentData[type])
 
   return (
     <Box>
+      <PageSection id="banner" layout={layout}>
       <PageBanner
         eyebrow={page.eyebrow}
         title={page.title}
@@ -20,6 +24,9 @@ export default function LegalPage({ type }) {
         paragraphs={page.heroParagraphs}
         crumbs={[{ label: page.title }]}
       />
+      </PageSection>
+
+      <PageSection id="body" layout={layout}>
       <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: 'brand.surface' }}>
         <Container maxWidth="md">
           <Box sx={{ bgcolor: '#fff', border: '1px solid', borderColor: 'brand.line', borderRadius: 3, p: { xs: 3, sm: 5, md: 7 } }}>
@@ -38,6 +45,7 @@ export default function LegalPage({ type }) {
           </Box>
         </Container>
       </Box>
+      </PageSection>
     </Box>
   )
 }

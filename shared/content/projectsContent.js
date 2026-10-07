@@ -103,6 +103,41 @@ export function newProject(existing = []) {
   return makeProject({ slug })
 }
 
+// ── Featured on the Home page ───────────────────────────────────────────────
+// A project is shown on Home when `featured` is true; `featuredTag` (badge)
+// and `featuredTint` (card colour) style its card. Cards use the project's own
+// title, summary and cover, in project-list order.
+//
+// Before this lived on the project, Home kept its own `featured.items` keyed by
+// slug. Until a project's `featured` flag is first set, that legacy list still
+// decides (and supplies its badge/tint), so existing cards don't vanish.
+const legacyBySlug = (legacyItems = []) =>
+  new Map(legacyItems.filter((item) => item?.slug).map((item) => [item.slug, item]))
+
+export const DEFAULT_FEATURED_TINT = '#006600'
+
+export const isProjectFeatured = (project, legacyItems = []) =>
+  project.featured ?? legacyBySlug(legacyItems).has(project.slug)
+
+export const projectFeaturedStyle = (project, legacyItems = []) => {
+  const legacy = legacyBySlug(legacyItems).get(project.slug) || {}
+  return {
+    tag: project.featuredTag ?? legacy.tag ?? '',
+    tint: project.featuredTint ?? legacy.tint ?? DEFAULT_FEATURED_TINT,
+  }
+}
+
+export const featuredProjectCards = (projects = [], legacyItems = []) =>
+  projects
+    .filter((project) => isProjectFeatured(project, legacyItems))
+    .map((project) => ({
+      slug: project.slug,
+      title: project.title,
+      copy: project.summary,
+      image: project.cover,
+      ...projectFeaturedStyle(project, legacyItems),
+    }))
+
 export const getProjectsContent = () => fetchPageContent(PROJECTS_PAGE_ID, projectsContentData)
 
 export const saveProjectsContent = (content) => persistPageContent(PROJECTS_PAGE_ID, content)

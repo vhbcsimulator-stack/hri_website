@@ -18,6 +18,10 @@ import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
 import { HOME_PAGE_ID, homeContentData } from '../../shared/content/homeContent'
+import RichParagraph from '../../shared/content/RichParagraph'
+import PageSection from '../components/PageSection'
+import { PROJECTS_PAGE_ID, projectsContentData, featuredProjectCards } from '../../shared/content/projectsContent'
+import { getLayout } from '../../shared/content/pageLayout'
 
 // Small icon + title + copy unit, used by the hero highlight strip and the
 // dark band beneath it. `onDark` is always light-on-dark; the default is
@@ -238,9 +242,7 @@ function Hero({ hero }) {
             <Box sx={{ width: 84, height: 3, bgcolor: { xs: '#a8ffa8', md: '#024A01' } }} />
             <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: { xs: '#a8ffa8', md: '#024A01' } }} />
           </Stack>
-          <Typography sx={{ mt: { xs: 2, md: 3 }, maxWidth: 560, fontSize: { xs: 15, sm: 16, md: 16.5 }, fontWeight: 300, lineHeight: 1.7, color: { xs: 'rgba(255,255,255,.9)', md: '#3a463a' } }}>
-            {hero.subtitle}
-          </Typography>
+          <RichParagraph value={hero.subtitle} sx={{ mt: { xs: 2, md: 3 }, maxWidth: 560, fontSize: { xs: 15, sm: 16, md: 16.5 }, fontWeight: 300, lineHeight: 1.7, color: { xs: 'rgba(255,255,255,.9)', md: '#3a463a' } }} />
           {/* Full-width stacked buttons on phones — side by side they drop to
               roughly 140px each and the labels wrap. */}
           <Stack
@@ -369,9 +371,7 @@ function SectionHead({ eyebrow, title, sub, center, underline }) {
         {title}
       </Typography>
       {sub && (
-        <Typography sx={{ mt: 2, color: 'text.secondary', fontSize: 16 }}>
-          {sub}
-        </Typography>
+        <RichParagraph value={sub} sx={{ mt: 2, color: 'text.secondary', fontSize: 16 }} />
       )}
     </Box>
   )
@@ -536,16 +536,13 @@ function FeaturedProjects({ featured }) {
                   {p.title}
                 </Typography>
 
-                <Typography
+                <RichParagraph value={p.copy}
                   sx={{
                     mt: 1.25,
                     fontSize: 14.5,
                     color: 'rgba(255,255,255,.85)',
                     maxWidth: '90%',
-                  }}
-                >
-                  {p.copy}
-                </Typography>
+                  }} />
 
                 <Stack
                   className="exploreLink"
@@ -596,9 +593,7 @@ function WhyChooseUs({ whyChooseUs }) {
             <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 12.5, fontWeight: 600, color: 'primary.main', mb: 1 }}>
               <TypewriterText speed={50}>{whyChooseUs.eyebrow}</TypewriterText>
             </Typography>
-            <Typography sx={{ mt: 1, color: 'text.secondary', fontSize: 16.5, maxWidth: 460 }}>
-              {whyChooseUs.description}
-            </Typography>
+            <RichParagraph value={whyChooseUs.description} sx={{ mt: 1, color: 'text.secondary', fontSize: 16.5, maxWidth: 460 }} />
             <Stack spacing={2.75} sx={{ mt: 4.5 }}>
               {whyChooseUs.reasons.map((r) => {
                 return (
@@ -616,7 +611,7 @@ function WhyChooseUs({ whyChooseUs }) {
                       <Typography className="reasonTitle" sx={{ fontWeight: 600, fontSize: 15, textTransform: 'uppercase', letterSpacing: '.6px', transition: 'color .25s ease' }}>
                         {r.title}
                       </Typography>
-                      <Typography sx={{ fontSize: 14.5, color: 'text.secondary' }}>{r.copy}</Typography>
+                      <RichParagraph value={r.copy} sx={{ fontSize: 14.5, color: 'text.secondary' }} />
                     </Box>
                   </Stack>
                 )
@@ -644,9 +639,7 @@ function WhyChooseUs({ whyChooseUs }) {
               borderLeft: '4px solid', borderColor: 'primary.main',
               transition: 'transform .3s ease',
             }}>
-              <Typography sx={{ fontSize: 14, color: 'text.primary' }}>
-                {whyChooseUs.quote}
-              </Typography>
+              <RichParagraph value={whyChooseUs.quote} sx={{ fontSize: 14, color: 'text.primary' }} />
             </Card>
           </Box>
         </Box>
@@ -676,9 +669,7 @@ function PropertyFeatures({ propertyFeatures }) {
             <Typography variant="h2" sx={{ color: '#fff', fontSize: { xs: 34, md: 56 }, fontWeight: 800, mt: 1 }}>
               {propertyFeatures.title}
             </Typography>
-            <Typography sx={{ mt: 2.5, maxWidth: 520, fontSize: 16.5, fontWeight: 300, color: 'rgba(255,255,255,.82)' }}>
-              {propertyFeatures.description}
-            </Typography>
+            <RichParagraph value={propertyFeatures.description} sx={{ mt: 2.5, maxWidth: 520, fontSize: 16.5, fontWeight: 300, color: 'rgba(255,255,255,.82)' }} />
             <Typography sx={{
               mt: 4.25, textTransform: 'uppercase', letterSpacing: '2px', fontSize: 12.5, fontWeight: 600,
               color: '#a8ffa8', pb: 1.5, borderBottom: '1px solid rgba(255,255,255,.18)',
@@ -696,7 +687,7 @@ function PropertyFeatures({ propertyFeatures }) {
                   <Typography className="keyTitle" variant="h4" sx={{ color: '#fff', fontSize: 14, textTransform: 'uppercase', letterSpacing: '.5px', transition: 'color .25s ease' }}>
                     {k.title}
                   </Typography>
-                  <Typography sx={{ mt: 1, fontSize: 13, color: 'rgba(255,255,255,.7)' }}>{k.copy}</Typography>
+                  <RichParagraph value={k.copy} sx={{ mt: 1, fontSize: 13, color: 'rgba(255,255,255,.7)' }} />
                 </Box>
               ))}
             </Box>
@@ -751,7 +742,7 @@ function Testimonials({ testimonials }) {
                 {getInitials(t.name)}
               </Avatar>
               <FormatQuoteIcon sx={{ color: 'primary.main', fontSize: 42, transform: 'scaleX(-1)' }} />
-              <Typography sx={{ fontSize: 14.5, color: 'text.secondary', lineHeight: 1.6 }}>{t.quote}</Typography>
+              <RichParagraph value={t.quote} sx={{ fontSize: 14.5, color: 'text.secondary', lineHeight: 1.6 }} />
               <FormatQuoteIcon sx={{ color: 'primary.main', fontSize: 42, ml: 'auto', transform: 'scaleX(-1) rotate(180deg)' }} />
               <Box sx={{ mt: 'auto', pt: 2.75 }}>
                 <Typography sx={{ fontWeight: 600, color: '#e09e0d' }}>{t.name}</Typography>
@@ -778,9 +769,7 @@ function CallToAction({ cta }) {
         <Typography variant="h2" sx={{ color: '#fff', textTransform: 'none', fontSize: { xs: 24, md: 36 }, fontWeight: 700 }}>
           {cta.title}
         </Typography>
-        <Typography sx={{ mt: 2, mb: 3.75, mx: 'auto', maxWidth: 540, fontSize: 16, fontWeight: 300, color: 'rgba(255,255,255,.85)' }}>
-          {cta.text}
-        </Typography>
+        <RichParagraph value={cta.text} sx={{ mt: 2, mb: 3.75, mx: 'auto', maxWidth: 540, fontSize: 16, fontWeight: 300, color: 'rgba(255,255,255,.85)' }} />
         <Button variant="contained" component={RouterLink} to="/projects" size="large"
           sx={{ bgcolor: '#fff', color: 'primary.dark', '&:hover': { bgcolor: 'transparent', color: "#fff" } }}>
           {cta.button}
@@ -794,25 +783,41 @@ function CallToAction({ cta }) {
 // Navbar/Footer are provided by the shared Layout.
 export default function HomePage() {
   const content = usePageContent(HOME_PAGE_ID, homeContentData)
+  const layout = getLayout(content, 'home')
+  // Featured cards come from the projects marked "Featured" in the admin.
+  const { projects } = usePageContent(PROJECTS_PAGE_ID, projectsContentData)
+  const featured = { ...content.featured, items: featuredProjectCards(projects, content.featured.items) }
 
   return (
     <Box>
-      <Hero hero={content.hero} />
-      <Reveal variant="up">
-        <FeaturedProjects featured={content.featured} />
-      </Reveal>
-      <Reveal variant="left">
-        <WhyChooseUs whyChooseUs={content.whyChooseUs} />
-      </Reveal>
-      <Reveal variant="right">
-        <PropertyFeatures propertyFeatures={content.propertyFeatures} />
-      </Reveal>
-      <Reveal variant="zoom">
-        <Testimonials testimonials={content.testimonials} />
-      </Reveal>
-      <Reveal variant="fade">
-        <CallToAction cta={content.cta} />
-      </Reveal>
+      <PageSection id="hero" layout={layout}>
+        <Hero hero={content.hero} />
+      </PageSection>
+      <PageSection id="featured" layout={layout}>
+        <Reveal variant="up">
+          <FeaturedProjects featured={featured} />
+        </Reveal>
+      </PageSection>
+      <PageSection id="whyChooseUs" layout={layout}>
+        <Reveal variant="left">
+          <WhyChooseUs whyChooseUs={content.whyChooseUs} />
+        </Reveal>
+      </PageSection>
+      <PageSection id="propertyFeatures" layout={layout}>
+        <Reveal variant="right">
+          <PropertyFeatures propertyFeatures={content.propertyFeatures} />
+        </Reveal>
+      </PageSection>
+      <PageSection id="testimonials" layout={layout}>
+        <Reveal variant="zoom">
+          <Testimonials testimonials={content.testimonials} />
+        </Reveal>
+      </PageSection>
+      <PageSection id="cta" layout={layout}>
+        <Reveal variant="fade">
+          <CallToAction cta={content.cta} />
+        </Reveal>
+      </PageSection>
     </Box>
   )
 }

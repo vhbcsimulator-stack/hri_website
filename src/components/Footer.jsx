@@ -3,6 +3,8 @@ import { Link as RouterLink } from 'react-router-dom'
 import { Box, Container, Typography, Stack, IconButton } from '@mui/material'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import useSiteSettings from '../hooks/useSiteSettings'
+import { isPathHidden } from '../../shared/content/pageLayout'
 
 // Footer link columns. `to` routes to a page; links without it are placeholders.
 const FOOTER_COLS = [
@@ -34,6 +36,11 @@ const FOOTER_COLS = [
 // Footer with quick links and back-to-top control.
 export default function Footer() {
   const [showTop, setShowTop] = useState(false)
+  // Pages switched off in the admin drop out of the link columns.
+  const settings = useSiteSettings()
+  const footerCols = FOOTER_COLS
+    .map((col) => ({ ...col, links: col.links.filter((l) => !l.to || !isPathHidden(settings, l.to)) }))
+    .filter((col) => col.links.length > 0)
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 600)
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -64,7 +71,7 @@ export default function Footer() {
               Brgy. Upli, Alfonso, Cavite
             </Typography>
           </Box>
-          {FOOTER_COLS.map((col) => (
+          {footerCols.map((col) => (
             <Box key={col.heading}>
               <Typography sx={{ color: '#fff', fontSize: 13, textTransform: 'uppercase', letterSpacing: '1.5px', mb: 2 }}>
                 {col.heading}

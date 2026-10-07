@@ -13,6 +13,9 @@ import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
 import { CONTACT_PAGE_ID, contactContentData } from '../../shared/content/contactContent'
+import RichParagraph from '../../shared/content/RichParagraph'
+import PageSection from '../components/PageSection'
+import { getLayout } from '../../shared/content/pageLayout'
 
 const PROPERTY_OPTIONS = ['Residential', 'Commercial']
 
@@ -28,6 +31,7 @@ const EMPTY = { first: '', last: '', email: '', phone: '', interest: '', message
 
 export default function ContactPage() {
   const content = usePageContent(CONTACT_PAGE_ID, contactContentData)
+  const layout = getLayout(content, 'contact')
   const { hero, inquiry, map, faq } = content
 
   const [form, setForm] = useState(EMPTY)
@@ -53,6 +57,7 @@ export default function ContactPage() {
 
   return (
     <Box>
+      <PageSection id="hero" layout={layout}>
       {/* Hero */}
       <Box sx={{ background: 'linear-gradient(150deg, #006600 0%, #024A01 60%, #032803 100%)', color: '#fff', pt: { xs: 14, md: 17 }, pb: { xs: 14, md: 10 }, textAlign: 'center' }}>
         <Container>
@@ -63,12 +68,12 @@ export default function ContactPage() {
             <HeroTitleReveal>{hero.title}</HeroTitleReveal>
           </Typography>
           <Box sx={{ width: 90, height: 3, borderRadius: 2, bgcolor: 'rgba(255,255,255,.7)', mt: 3, mx: 'auto' }} />
-          <Typography sx={{ mt: 3, maxWidth: 620, mx: 'auto', fontSize: { xs: 15, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)' }}>
-            {hero.subtitle}
-          </Typography>
+          <RichParagraph value={hero.subtitle} sx={{ mt: 3, maxWidth: 620, mx: 'auto', fontSize: { xs: 15, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)' }} />
         </Container>
       </Box>
+      </PageSection>
 
+      <PageSection id="inquiry" layout={layout}>
       {/* Inquiry — single elevated panel */}
       <Reveal variant="zoom-up">
       <Box component="section" sx={{ pb: { xs: 8, md: 12 } }}>
@@ -88,9 +93,7 @@ export default function ContactPage() {
                 <Typography variant="h2" sx={{ color: '#fff', textTransform: 'none', fontSize: { xs: 24, md: 28 }, mb: 1.5 }}>
                   {inquiry.heading}
                 </Typography>
-                <Typography sx={{ color: 'rgba(255,255,255,.85)', fontSize: 15, fontWeight: 300, mb: 4 }}>
-                  {inquiry.description}
-                </Typography>
+                <RichParagraph value={inquiry.description} sx={{ color: 'rgba(255,255,255,.85)', fontSize: 15, fontWeight: 300, mb: 4 }} />
 
                 <Stack spacing={2.75}>
                   {inquiry.info.map((info, i) => (
@@ -149,7 +152,9 @@ export default function ContactPage() {
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="map" layout={layout}>
       {/* Google Map */}
       <Box component="section" sx={{ height: { xs: 320, md: 420 } }}>
         <Box
@@ -161,7 +166,9 @@ export default function ContactPage() {
           referrerPolicy="no-referrer-when-downgrade"
         />
       </Box>
+      </PageSection>
 
+      <PageSection id="faq" layout={layout}>
       {/* FAQ */}
       <Reveal variant="zoom">
       <Box component="section" sx={{ py: { xs: 8, md: 12 }, bgcolor: 'rgba(0,0,255,0.03)' }}>
@@ -182,7 +189,7 @@ export default function ContactPage() {
                   <Typography sx={{ fontWeight: 500, fontSize: 16 }}>{f.q}</Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ px: 2.5, pb: 2.5, pt: 0, pl: 6 }}>
-                  <Typography sx={{ color: 'text.secondary', fontSize: 15 }}>{f.a}</Typography>
+                  <RichParagraph value={f.a} sx={{ color: 'text.secondary', fontSize: 15 }} />
                 </AccordionDetails>
               </Accordion>
             ))}
@@ -190,6 +197,7 @@ export default function ContactPage() {
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
     </Box>
   )
 }

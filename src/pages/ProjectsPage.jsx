@@ -12,6 +12,7 @@ import Reveal from '../components/Reveal'
 import HeroTitleReveal from '../components/HeroTitleReveal'
 import usePageContent from '../hooks/usePageContent'
 import { PROJECTS_PAGE_ID, projectsContentData } from '../../shared/content/projectsContent'
+import RichParagraph from '../../shared/content/RichParagraph'
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1920&q=80'
 
@@ -58,7 +59,7 @@ function ProjectCard({ project }) {
         <Typography className="cardTitle" variant="h3" sx={{ color: '#024A01', fontSize: { xs: 22, md: 28 }, fontWeight: 700, textTransform: 'uppercase', mb: 2, transition: 'color .3s ease' }}>
           {project.title}
         </Typography>
-        <Typography sx={{ color: 'text.secondary', fontSize: 16, mb: 3 }}>{project.summary}</Typography>
+        <RichParagraph value={project.summary} sx={{ color: 'text.secondary', fontSize: 16, mb: 3 }} />
         <Stack
           className="cardExplore"
           component={RouterLink} to={`/project-details?slug=${project.slug}`} direction="row" spacing={.75}
@@ -101,7 +102,7 @@ export default function ProjectsPage() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return projects.filter((p) => {
-      const matchesSearch = !q || [p.title, p.summary, p.location].some((f) => String(f).toLowerCase().includes(q))
+      const matchesSearch = !q || [p.title, p.summary, p.location].some((f) => String(f).replace(/<[^>]+>/g, ' ').toLowerCase().includes(q))
       const matchesLocation = location === 'All Location' || String(p.location).trim() === location
       const matchesType = type === 'All Types' || p.type === type
       return matchesSearch && matchesLocation && matchesType

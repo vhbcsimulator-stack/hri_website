@@ -9,6 +9,9 @@ import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
 import { PROJECTS_PAGE_ID, projectsContentData } from '../../shared/content/projectsContent'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import RichParagraph from '../../shared/content/RichParagraph'
+import PageSection from '../components/PageSection'
+import { getLayout, projectLayoutKey } from '../../shared/content/pageLayout'
 
 // Underlined form field styled for the dark green enquiry section.
 const whiteField = {
@@ -27,6 +30,7 @@ export default function ProjectDetailsPage() {
   const projects = content.projects || []
   // Fall back to the first project so a missing/legacy link still renders.
   const project = projects.find((p) => p.slug === slug) || projects[0]
+  const layout = getLayout(content, projectLayoutKey(project?.slug))
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const onForm = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -67,6 +71,7 @@ export default function ProjectDetailsPage() {
 
   return (
     <Box>
+      <PageSection id="hero" layout={layout}>
       {/* Hero */}
       <Box sx={{ position: 'relative', color: '#fff', pt: { xs: 14, md: 16 }, pb: { xs: 8, md: 10 }, textAlign: 'center', overflow: 'hidden' }}>
         <Box ref={bgRef} aria-hidden sx={{ position: 'absolute', inset: 0, backgroundImage: `url(${hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#052905', transformOrigin: 'center 40%', willChange: 'transform' }} />
@@ -109,9 +114,7 @@ export default function ProjectDetailsPage() {
               <HeroTitleReveal>{project.title}</HeroTitleReveal>
             </Typography>
           </Box>
-          <Typography sx={{ maxWidth: 640, mx: 'auto', fontSize: { xs: 14.5, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)', mb: 4 }}>
-            {hero.subtitle}
-          </Typography>
+          <RichParagraph value={hero.subtitle} sx={{ maxWidth: 640, mx: 'auto', fontSize: { xs: 14.5, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)', mb: 4 }} />
           <Stack direction="row" spacing={2} sx={{ justifyContent: 'center', flexWrap: 'wrap', gap: 1.5 }}>
             <Button variant="contained" color="primary" size="large" href="#inquire">
               {hero.primaryCta}
@@ -123,7 +126,9 @@ export default function ProjectDetailsPage() {
           </Stack>
         </Container>
       </Box>
+      </PageSection>
 
+      <PageSection id="intro" layout={layout}>
       {/* A place to call home */}
       <Reveal variant="right">
       <Box component="section" sx={{ py: { xs: 7, md: 11 } }}>
@@ -133,12 +138,8 @@ export default function ProjectDetailsPage() {
               <Typography sx={{ textTransform: 'uppercase', letterSpacing: '2px', fontSize: 13, fontWeight: 600, color: 'primary.main', mb: 2 }}>
                 <TypewriterText speed={50}>{intro.eyebrow}</TypewriterText>
               </Typography>
-              <Typography sx={{ color: 'text.secondary', fontSize: 16, mb: 3 }}>
-                {intro.description}
-              </Typography>
-              <Typography sx={{ borderLeft: '3px solid', borderColor: 'primary.main', pl: 2, color: 'text.primary', fontStyle: 'italic', mb: 3.5 }}>
-                {intro.quote}
-              </Typography>
+              <RichParagraph value={intro.description} sx={{ color: 'text.secondary', fontSize: 16, mb: 3 }} />
+              <RichParagraph value={intro.quote} sx={{ borderLeft: '3px solid', borderColor: 'primary.main', pl: 2, color: 'text.primary', fontStyle: 'italic', mb: 3.5 }} />
               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2.5 }}>
                 {intro.details.map((d, i) => (
                   <Box key={i} sx={{
@@ -147,7 +148,7 @@ export default function ProjectDetailsPage() {
                     '&:hover': { transform: 'translateY(-4px)', bgcolor: 'brand.surface' },
                   }}>
                     <Typography sx={{ color: 'secondary.main', fontWeight: 700, fontSize: 14, textTransform: 'uppercase', mb: .75 }}>{d.title}</Typography>
-                    <Typography sx={{ color: 'text.secondary', fontSize: 13.5 }}>{d.copy}</Typography>
+                    <RichParagraph value={d.copy} sx={{ color: 'text.secondary', fontSize: 13.5 }} />
                   </Box>
                 ))}
               </Box>
@@ -171,22 +172,24 @@ export default function ProjectDetailsPage() {
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="gallery" layout={layout}>
       {/* Gallery */}
       <Reveal variant="zoom">
       <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: 'brand.surface' }}>
         <Container>
           <Stack sx={{ mb: 5, alignItems: 'center', textAlign: 'center' }}>
             <Typography variant="h2" sx={{ color: 'primary.main', fontSize: { xs: 30, md: 40 } }}>{gallery.title}</Typography>
-            <Typography sx={{ mt: 1.5, color: 'text.secondary', fontSize: 15.5, maxWidth: 700 }}>
-              {gallery.description}
-            </Typography>
+            <RichParagraph value={gallery.description} sx={{ mt: 1.5, color: 'text.secondary', fontSize: 15.5, maxWidth: 700 }} />
           </Stack>
           <ExpandingGallery items={gallery.items} />
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="features" layout={layout}>
       {/* Key Features */}
       <Reveal variant="up">
       <Box component="section" id="features" sx={{ py: { xs: 8, md: 12 } }}>
@@ -219,16 +222,16 @@ export default function ProjectDetailsPage() {
                 <Typography sx={{ fontWeight: 700, fontSize: { xs: 18, md: 21 }, textTransform: 'uppercase', letterSpacing: '.4px', mb: 1.5, pr: 6 }}>
                   {f.title}
                 </Typography>
-                <Typography sx={{ fontSize: 15, color: f.dark ? 'rgba(255,255,255,.82)' : 'text.secondary', maxWidth: '90%' }}>
-                  {f.copy}
-                </Typography>
+                <RichParagraph value={f.copy} sx={{ fontSize: 15, color: f.dark ? 'rgba(255,255,255,.82)' : 'text.secondary', maxWidth: '90%' }} />
               </Box>
             ))}
           </Box>
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
 
+      <PageSection id="inquiry" layout={layout}>
       {/* Begin your journey */}
       <Reveal variant="left">
       <Box component="section" id="inquire" sx={{ py: { xs: 8, md: 11 }, background: 'linear-gradient(180deg, #006600 0%, #024A01 55%, #021c02 100%)', color: '#fff' }}>
@@ -238,9 +241,7 @@ export default function ProjectDetailsPage() {
               <Typography variant="h2" sx={{ color: '#fff', fontSize: { xs: 26, md: 34 }, mb: 2 }}>
                 {inquiry.title}
               </Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,.82)', fontSize: 15.5, fontWeight: 300, maxWidth: 420 }}>
-                {inquiry.description}
-              </Typography>
+              <RichParagraph value={inquiry.description} sx={{ color: 'rgba(255,255,255,.82)', fontSize: 15.5, fontWeight: 300, maxWidth: 420 }} />
             </Box>
             <Box component="form" onSubmit={(e) => e.preventDefault()}>
               <Stack spacing={3.5}>
@@ -258,6 +259,7 @@ export default function ProjectDetailsPage() {
         </Container>
       </Box>
       </Reveal>
+      </PageSection>
     </Box>
   )
 }
