@@ -217,7 +217,8 @@
         "subtitle": "Explore residential and commercial property opportunities designed to support your lifestyle, business, and long-term goals.",
         "primaryCta": "Explore Properties",
         "secondaryCta": "Learn More",
-        "titleHighlight": "An Investment for Tomorrow."
+        "titleHighlight": "An Investment for Tomorrow.",
+        "titleExtra": []
       },
       "featured": {
         "items": [

@@ -64,6 +64,7 @@ function Hero({ hero }) {
   const highlights = hero.highlights || []
   const bottomBar = hero.bottomBar || []
   const statCard = hero.statCard
+  const titleLines = [hero.title, hero.titleHighlight, ...(hero.titleExtra || [])].filter(Boolean)
 
   // Scroll-driven parallax (matches the project-details hero): the image slowly
   // zooms while the foreground content lifts faster and fades —
@@ -195,53 +196,42 @@ function Hero({ hero }) {
           {/* 68px only from lg. At md (900px) the column is already narrow, so
               a larger size overflows between 900px and roughly 1200px. */}
           <Typography variant="h1" sx={{ fontSize: { xs: 32, sm: 44, md: 52, lg: 68 }, lineHeight: 1.08 }}>
-            <Box component="span" sx={{ display: 'block', overflow: 'hidden', pb: '.08em', mb: '-.08em' }}>
-              <Box
-                component="span"
-                sx={{
-                  // Below md the copy sits over the photo, where the brand
-                  // green and blue have no contrast.
-                  color: { xs: '#fff', md: '#024A01' },
-                  display: 'block',
-                  opacity: 0,
-                  animation: 'heroTitleReveal 900ms cubic-bezier(.16, 1, .3, 1) 120ms forwards',
-                  '@keyframes heroTitleReveal': {
-                    from: { opacity: 0, transform: 'translateY(105%)' },
-                    to: { opacity: 1, transform: 'translateY(0)' },
-                  },
-                  '@media (prefers-reduced-motion: reduce)': {
-                    opacity: 1,
-                    animation: 'none',
-                    transform: 'none',
-                  },
-                }}
-              >
-                {hero.title}
-              </Box>
-            </Box>
-            <Box component="span" sx={{ display: 'block', overflow: 'hidden', pb: '.08em', mb: '-.08em' }}>
-              <Box
-                component="span"
-                sx={{
-                  display: 'block',
-                  color: { xs: '#a8ffa8', md: '#0000b4' },
-                  fontWeight: 700,
-                  opacity: 0,
-                  animation: 'heroHighlightReveal 950ms cubic-bezier(.16, 1, .3, 1) 340ms forwards',
-                  '@keyframes heroHighlightReveal': {
-                    from: { opacity: 0, transform: 'translateY(105%) scale(.98)' },
-                    to: { opacity: 1, transform: 'translateY(0) scale(1)' },
-                  },
-                  '@media (prefers-reduced-motion: reduce)': {
-                    opacity: 1,
-                    animation: 'none',
-                    transform: 'none',
-                  },
-                }}
-              >
-                {hero.titleHighlight}
-              </Box>
-            </Box>
+            {/* Every line alternates: even lines green, odd lines blue and bold.
+                Each reveals 220ms after the one above it. */}
+            {titleLines.map((line, index) => {
+              const accent = index % 2 === 1
+              return (
+                <Box key={index} component="span" sx={{ display: 'block', overflow: 'hidden', pb: '.08em', mb: '-.08em' }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'block',
+                      // Below md the copy sits over the photo, where the brand
+                      // green and blue have no contrast.
+                      color: accent ? { xs: '#a8ffa8', md: '#0000b4' } : { xs: '#fff', md: '#024A01' },
+                      fontWeight: accent ? 700 : undefined,
+                      opacity: 0,
+                      animation: `${accent ? 'heroHighlightReveal 950ms' : 'heroTitleReveal 900ms'} cubic-bezier(.16, 1, .3, 1) ${120 + index * 220}ms forwards`,
+                      '@keyframes heroTitleReveal': {
+                        from: { opacity: 0, transform: 'translateY(105%)' },
+                        to: { opacity: 1, transform: 'translateY(0)' },
+                      },
+                      '@keyframes heroHighlightReveal': {
+                        from: { opacity: 0, transform: 'translateY(105%) scale(.98)' },
+                        to: { opacity: 1, transform: 'translateY(0) scale(1)' },
+                      },
+                      '@media (prefers-reduced-motion: reduce)': {
+                        opacity: 1,
+                        animation: 'none',
+                        transform: 'none',
+                      },
+                    }}
+                  >
+                    {line}
+                  </Box>
+                </Box>
+              )
+            })}
           </Typography>
           {/* Rule-and-dot separating the title from the supporting copy. */}
           <Stack direction="row" spacing={1} aria-hidden sx={{ mt: { xs: 2.5, md: 3.5 }, alignItems: 'center' }}>
