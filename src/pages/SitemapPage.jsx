@@ -5,6 +5,7 @@ import usePageContent from '../hooks/usePageContent'
 import { SITEMAP_PAGE_ID, sitemapContentData, normalizeSitemapContent } from '../../shared/content/sitemapContent'
 import RichParagraph from '../../shared/content/RichParagraph'
 import PageSection from '../components/PageSection'
+import PageSections from '../components/PageSections'
 import { getLayout } from '../../shared/content/pageLayout'
 
 export default function SitemapPage() {
@@ -13,7 +14,7 @@ export default function SitemapPage() {
   const layout = getLayout(content, 'sitemap')
 
   return (
-    <Box>
+    <PageSections pageKey="sitemap" layout={layout}>
       <PageSection id="banner" layout={layout}>
       <PageBanner
         eyebrow={content.eyebrow}
@@ -45,6 +46,6 @@ export default function SitemapPage() {
         </Container>
       </Box>
       </PageSection>
-    </Box>
+    </PageSections>
   )
 }

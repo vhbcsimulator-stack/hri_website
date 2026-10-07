@@ -15,6 +15,7 @@ import MaterialSymbol from '../../shared/content/MaterialSymbol'
 import { CONTACT_PAGE_ID, contactContentData } from '../../shared/content/contactContent'
 import RichParagraph from '../../shared/content/RichParagraph'
 import PageSection from '../components/PageSection'
+import PageSections from '../components/PageSections'
 import { getLayout } from '../../shared/content/pageLayout'
 
 const PROPERTY_OPTIONS = ['Residential', 'Commercial']
@@ -56,7 +57,7 @@ export default function ContactPage() {
   }
 
   return (
-    <Box>
+    <PageSections pageKey="contact" layout={layout}>
       <PageSection id="hero" layout={layout}>
       {/* Hero */}
       <Box sx={{ background: 'linear-gradient(150deg, #006600 0%, #024A01 60%, #032803 100%)', color: '#fff', pt: { xs: 14, md: 17 }, pb: { xs: 14, md: 10 }, textAlign: 'center' }}>
@@ -198,6 +199,6 @@ export default function ContactPage() {
       </Box>
       </Reveal>
       </PageSection>
-    </Box>
+    </PageSections>
   )
 }

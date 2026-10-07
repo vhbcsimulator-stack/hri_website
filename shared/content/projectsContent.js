@@ -1,4 +1,5 @@
 import { fetchPageContent, persistPageContent } from '@content-backend'
+import { projectLayoutKey } from './pageLayout'
 
 export const PROJECTS_PAGE_ID = 'projects'
 
@@ -137,6 +138,49 @@ export const featuredProjectCards = (projects = [], legacyItems = []) =>
       image: project.cover,
       ...projectFeaturedStyle(project, legacyItems),
     }))
+
+// ── Slug follows the title ──────────────────────────────────────────────────
+// A project's URL slug is derived from its title. Renaming keeps the slug
+// unique, remembers the old one in `previousSlugs` (so links and bookmarks to
+// it still open the project), and carries over everything keyed by slug: the
+// details-page section layout, and a Home "featured" status that still came
+// from Home's old slug-keyed list.
+export function renameProjectForTitle(content, index, title, legacyFeatured = []) {
+  const project = content.projects[index]
+  const taken = new Set(content.projects
+    .filter((_, i) => i !== index)
+    .flatMap((p) => [p.slug, ...(p.previousSlugs || [])]))
+  const base = slugify(title)
+  let slug = base
+  let n = 2
+  while (taken.has(slug)) slug = `${base}-${n++}`
+
+  const next = { ...project, title }
+  let { pageLayouts } = content
+  if (slug !== project.slug) {
+    next.slug = slug
+    next.previousSlugs = [...new Set([...(project.previousSlugs || []), project.slug])].filter((s) => s !== slug)
+    if (project.featured === undefined && isProjectFeatured(project, legacyFeatured)) {
+      const style = projectFeaturedStyle(project, legacyFeatured)
+      Object.assign(next, { featured: true, featuredTag: style.tag, featuredTint: style.tint })
+    }
+    const oldKey = projectLayoutKey(project.slug)
+    if (pageLayouts?.[oldKey]) {
+      const { [oldKey]: moved, ...rest } = pageLayouts
+      pageLayouts = { ...rest, [projectLayoutKey(slug)]: moved }
+    }
+  }
+
+  return {
+    ...content,
+    projects: content.projects.map((p, i) => (i === index ? next : p)),
+    ...(pageLayouts ? { pageLayouts } : {}),
+  }
+}
+
+// The project a link points at — by current slug, or by one it used to have.
+export const findProjectBySlug = (projects = [], slug) =>
+  projects.find((p) => p.slug === slug) || projects.find((p) => p.previousSlugs?.includes(slug))
 
 export const getProjectsContent = () => fetchPageContent(PROJECTS_PAGE_ID, projectsContentData)
 

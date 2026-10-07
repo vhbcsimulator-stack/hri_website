@@ -7,10 +7,11 @@ import HeroTitleReveal from '../components/HeroTitleReveal'
 import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { PROJECTS_PAGE_ID, projectsContentData } from '../../shared/content/projectsContent'
+import { PROJECTS_PAGE_ID, projectsContentData, findProjectBySlug } from '../../shared/content/projectsContent'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RichParagraph from '../../shared/content/RichParagraph'
 import PageSection from '../components/PageSection'
+import PageSections from '../components/PageSections'
 import { getLayout, projectLayoutKey } from '../../shared/content/pageLayout'
 
 // Underlined form field styled for the dark green enquiry section.
@@ -29,7 +30,8 @@ export default function ProjectDetailsPage() {
   const content = usePageContent(PROJECTS_PAGE_ID, projectsContentData)
   const projects = content.projects || []
   // Fall back to the first project so a missing/legacy link still renders.
-  const project = projects.find((p) => p.slug === slug) || projects[0]
+  // A renamed project is still found by its old slug, so existing links work.
+  const project = findProjectBySlug(projects, slug) || projects[0]
   const layout = getLayout(content, projectLayoutKey(project?.slug))
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
@@ -70,11 +72,11 @@ export default function ProjectDetailsPage() {
   const { hero, intro, gallery, features, inquiry } = project
 
   return (
-    <Box>
+    <PageSections pageKey="project-details" layout={layout}>
       <PageSection id="hero" layout={layout}>
       {/* Hero */}
       <Box sx={{ position: 'relative', color: '#fff', pt: { xs: 14, md: 16 }, pb: { xs: 8, md: 10 }, textAlign: 'center', overflow: 'hidden' }}>
-        <Box ref={bgRef} aria-hidden sx={{ position: 'absolute', inset: 0, backgroundImage: `url(${hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#052905', transformOrigin: 'center 40%', willChange: 'transform' }} />
+        <Box ref={bgRef} aria-hidden sx={{ position: 'absolute', inset: 0, backgroundImage: `url(${project.cover || hero.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#052905', transformOrigin: 'center 40%', willChange: 'transform' }} />
         <Box aria-hidden sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(2,20,2,.6) 0%, rgba(2,20,2,.4) 50%, rgba(2,20,2,.72) 100%)' }} />
         <Container ref={contentRef} sx={{ position: 'relative', zIndex: 2, willChange: 'transform, opacity, filter' }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', mb: 2.5 }}>
@@ -114,7 +116,7 @@ export default function ProjectDetailsPage() {
               <HeroTitleReveal>{project.title}</HeroTitleReveal>
             </Typography>
           </Box>
-          <RichParagraph value={hero.subtitle} sx={{ maxWidth: 640, mx: 'auto', fontSize: { xs: 14.5, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)', mb: 4 }} />
+          <RichParagraph value={project.summary} sx={{ maxWidth: 640, mx: 'auto', fontSize: { xs: 14.5, md: 17 }, fontWeight: 300, color: 'rgba(255,255,255,.9)', mb: 4 }} />
           <Stack direction="row" spacing={2} sx={{ justifyContent: 'center', flexWrap: 'wrap', gap: 1.5 }}>
             <Button variant="contained" color="primary" size="large" href="#inquire">
               {hero.primaryCta}
@@ -260,7 +262,7 @@ export default function ProjectDetailsPage() {
       </Box>
       </Reveal>
       </PageSection>
-    </Box>
+    </PageSections>
   )
 }
 

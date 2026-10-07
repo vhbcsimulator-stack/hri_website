@@ -4,6 +4,7 @@ import ContentBlocks from '../components/ContentBlocks'
 import usePageContent from '../hooks/usePageContent'
 import { LEGAL_PAGE_ID, legalContentData, normalizeLegalDoc } from '../../shared/content/legalContent'
 import PageSection from '../components/PageSection'
+import PageSections from '../components/PageSections'
 import { getLayout, LEGAL_LAYOUT_KEYS } from '../../shared/content/pageLayout'
 
 // Renders whichever legal document matches `type` (privacy | terms | cookies).
@@ -15,7 +16,7 @@ export default function LegalPage({ type }) {
   const page = normalizeLegalDoc(content[type] || legalContentData[type])
 
   return (
-    <Box>
+    <PageSections pageKey={LEGAL_LAYOUT_KEYS[type]} layout={layout}>
       <PageSection id="banner" layout={layout}>
       <PageBanner
         eyebrow={page.eyebrow}
@@ -46,6 +47,6 @@ export default function LegalPage({ type }) {
         </Container>
       </Box>
       </PageSection>
-    </Box>
+    </PageSections>
   )
 }

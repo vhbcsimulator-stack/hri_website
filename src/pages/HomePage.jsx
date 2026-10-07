@@ -20,6 +20,7 @@ import MaterialSymbol from '../../shared/content/MaterialSymbol'
 import { HOME_PAGE_ID, homeContentData } from '../../shared/content/homeContent'
 import RichParagraph from '../../shared/content/RichParagraph'
 import PageSection from '../components/PageSection'
+import PageSections from '../components/PageSections'
 import { PROJECTS_PAGE_ID, projectsContentData, featuredProjectCards } from '../../shared/content/projectsContent'
 import { getLayout } from '../../shared/content/pageLayout'
 
@@ -789,7 +790,7 @@ export default function HomePage() {
   const featured = { ...content.featured, items: featuredProjectCards(projects, content.featured.items) }
 
   return (
-    <Box>
+    <PageSections pageKey="home" layout={layout}>
       <PageSection id="hero" layout={layout}>
         <Hero hero={content.hero} />
       </PageSection>
@@ -818,6 +819,6 @@ export default function HomePage() {
           <CallToAction cta={content.cta} />
         </Reveal>
       </PageSection>
-    </Box>
+    </PageSections>
   )
 }

@@ -9,6 +9,7 @@ import { ABOUT_PAGE_ID, aboutContentData, missionVisionBodyHtml, missionVisionCo
 import { sanitizeRichText, richTextSx } from '../../shared/content/richText'
 import RichParagraph from '../../shared/content/RichParagraph'
 import PageSection from '../components/PageSection'
+import PageSections from '../components/PageSections'
 import { getLayout } from '../../shared/content/pageLayout'
 
 // Brand accent: interlocking blue/green rings used above section titles.
@@ -42,7 +43,7 @@ export default function AboutPage() {
 
   const layout = getLayout(content, 'about')
   return (
-    <Box>
+    <PageSections pageKey="about" layout={layout}>
       <PageSection id="hero" layout={layout}>
       {/* Hero */}
       <Box component="section" sx={{ pt: { xs: 13, md: 17 }, pb: { xs: 7, md: 11 }, position: 'relative', overflow: 'hidden' }}>
@@ -283,6 +284,6 @@ export default function AboutPage() {
       </Box>
       </Reveal>
       </PageSection>
-    </Box>
+    </PageSections>
   )
 }
