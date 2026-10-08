@@ -396,14 +396,15 @@ function FeaturedProjects({ featured }) {
           title={featured.title}
         />
 
+        {/* Half-width cards in a centred wrap, so a lone card (or an odd last
+            one) sits in the middle instead of the left column. */}
         <Box
           sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: '1fr 1fr',
-            },
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
             gap: 3.5,
+            '& > *': { width: { xs: '100%', sm: 'calc(50% - 14px)' } },
           }}
         >
           {featured.items.map((p) => (
