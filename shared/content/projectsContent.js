@@ -64,6 +64,10 @@ function makeProject(overrides = {}) {
 }
 
 export const projectsContentData = {
+  // Banner at the top of the public /projects listing page.
+  listingHero: {
+    image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1920&q=80',
+  },
   projects: [
     makeProject({
       slug: 'residential-communities',

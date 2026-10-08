@@ -14,9 +14,9 @@ import usePageContent from '../hooks/usePageContent'
 import { PROJECTS_PAGE_ID, projectsContentData } from '../../shared/content/projectsContent'
 import RichParagraph from '../../shared/content/RichParagraph'
 
-const HERO_IMG = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1920&q=80'
+// Fallback only — the banner image is set in the admin's Projects page.
+const HERO_IMG ='https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1920&q=80'
 
-const TYPES = ['All Types', 'Residential', 'Commercial']
 
 // Rounded input styling for the search/filter bar, with hover + focus accents.
 const fieldStyles = {
@@ -92,6 +92,18 @@ export default function ProjectsPage() {
     ],
     [projects],
   )
+  // Only the types the listed projects actually use (set per project in the admin).
+  const types = useMemo(
+    () => [
+      'All Types',
+      ...new Set(
+        projects
+          .map((project) => String(project.type || '').trim())
+          .filter(Boolean),
+      ),
+    ],
+    [projects],
+  )
 
   const [search, setSearch] = useState('')
   const [location, setLocation] = useState('All Location')
@@ -104,7 +116,7 @@ export default function ProjectsPage() {
     return projects.filter((p) => {
       const matchesSearch = !q || [p.title, p.summary, p.location].some((f) => String(f).replace(/<[^>]+>/g, ' ').toLowerCase().includes(q))
       const matchesLocation = location === 'All Location' || String(p.location).trim() === location
-      const matchesType = type === 'All Types' || p.type === type
+      const matchesType = type === 'All Types' || String(p.type || '').trim() === type
       return matchesSearch && matchesLocation && matchesType
     })
   }, [projects, search, location, type])
@@ -135,7 +147,7 @@ export default function ProjectsPage() {
     <Box>
       {/* Hero + search */}
       <Box sx={{ position: 'relative', color: '#fff', pt: { xs: 14, md: 17 }, pb: { xs: 8, md: 11 }, overflow: 'hidden' }}>
-        <Box ref={bgRef} aria-hidden sx={{ position: 'absolute', inset: 0, backgroundImage: `url(${HERO_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#052905', transformOrigin: 'center 40%', willChange: 'transform' }} />
+        <Box ref={bgRef} aria-hidden sx={{ position: 'absolute', inset: 0, backgroundImage: `url(${content.listingHero?.image || HERO_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#052905', transformOrigin: 'center 40%', willChange: 'transform' }} />
         <Box aria-hidden sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(2,20,2,.6) 0%, rgba(2,20,2,.45) 50%, rgba(2,20,2,.7) 100%)' }} />
         <Container sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
           <Box ref={headingRef} sx={{ willChange: 'transform, opacity' }}>
@@ -168,7 +180,7 @@ export default function ProjectsPage() {
             </TextField>
             <TextField select size="small" value={type} onChange={(e) => setType(e.target.value)}
               slotProps={{ input: { startAdornment: (<InputAdornment position="start"><HomeWorkOutlinedIcon sx={{ color: 'primary.main', fontSize: 20 }} /></InputAdornment>) } }}>
-              {TYPES.map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+              {types.map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
             </TextField>
             <Button variant="contained" color="primary" startIcon={<TuneIcon />}
               onClick={() => { setSearch(''); setLocation('All Location'); setType('All Types') }}
