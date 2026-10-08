@@ -5,7 +5,7 @@ import HeroTitleReveal from '../components/HeroTitleReveal'
 import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { ABOUT_PAGE_ID, aboutContentData, missionVisionBodyHtml, missionVisionColumns } from '../../shared/content/aboutContent'
+import { ABOUT_PAGE_ID, aboutContentData, missionVisionBodyHtml, missionVisionColumns, missionVisionCardVars, missionVisionBodySx, coreValuesCardWidth } from '../../shared/content/aboutContent'
 import { sanitizeRichText, richTextSx } from '../../shared/content/richText'
 import RichParagraph from '../../shared/content/RichParagraph'
 import PageSection from '../components/PageSection'
@@ -39,7 +39,7 @@ function SectionTitle({ children, icon }) {
 // provided by the shared Layout.
 export default function AboutPage() {
   const content = usePageContent(ABOUT_PAGE_ID, aboutContentData)
-  const { hero, coreValues, missionVision, whatWeDo, whyChoose, cta } = content
+  const { hero, purpose, coreValues, missionVision, whatWeDo, whyChoose, cta } = content
 
   const layout = getLayout(content, 'about')
   return (
@@ -101,28 +101,71 @@ export default function AboutPage() {
       </Box>
       </PageSection>
 
+      <PageSection id="purpose" layout={layout}>
+      {/* Our Purpose */}
+      <Reveal variant="up">
+      <Box component="section" sx={{ py: { xs: 8, md: 11 }, bgcolor: 'brand.surface' }}>
+        <Container>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.1fr' }, gap: { xs: 4, md: 8 }, alignItems: 'center' }}>
+            <Box>
+              <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, mb: 2 }}>
+                <Box sx={{ width: 34, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#0000FF,#006600)' }} />
+                <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 12.5, fontWeight: 600, color: 'primary.main' }}>
+                  {purpose.eyebrow}
+                </Typography>
+              </Stack>
+              <Typography variant="h2" sx={{ color: 'primary.dark', fontSize: { xs: 28, md: 38 }, textTransform: 'none', lineHeight: 1.15 }}>
+                {purpose.titleLead}{' '}
+                <Box component="span" sx={{ color: 'primary.main' }}>{purpose.titleHighlight}</Box>
+              </Typography>
+            </Box>
+            <Box>
+              <RichParagraph value={purpose.para1} sx={{ color: 'text.secondary', fontSize: 16, mb: 3 }} />
+              <Box sx={{ borderLeft: '3px solid', borderColor: 'primary.main', pl: 2.5 }}>
+                <RichParagraph value={purpose.para2} sx={{ color: 'primary.dark', fontSize: 17, fontWeight: 500 }} />
+              </Box>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+      </Reveal>
+      </PageSection>
+
       <PageSection id="coreValues" layout={layout}>
       {/* Core Values */}
       <Reveal variant="up">
       <Box component="section" sx={{ py: { xs: 7, md: 10 } }}>
         <Container>
           <SectionTitle>{coreValues.title}</SectionTitle>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(5, 1fr)' }, gap: 2.5 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '24px' }}>
             {coreValues.items.map((v, i) => (
               <Box key={i} sx={{
-                bgcolor: 'rgba(0,0,255,0.035)',
-                borderRadius: 2, p: 3, textAlign: 'center', cursor: 'default',
-                transition: 'transform .28s ease, .28s ease, border-color .28s ease, background .28s ease',
-                '&:hover': { transform: 'translateY(-6px)', bgcolor: '#fff', borderColor: 'secondary.main', },
-                '&:hover .valueIcon': { transform: 'scale(1.12)' },
+                width: coreValuesCardWidth(coreValues.items.length),
+                position: 'relative', overflow: 'hidden',
+                bgcolor: 'rgba(0,0,255,0.035)', border: '1px solid transparent',
+                borderRadius: 3, px: { xs: 3, md: 4 }, py: { xs: 3.5, md: 4.5 }, textAlign: 'center', cursor: 'default',
+                transition: 'transform .28s ease, border-color .28s ease, background-color .28s ease, box-shadow .28s ease',
+                '&::before': {
+                  content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+                  background: 'linear-gradient(90deg,#0000FF,#006600)',
+                  transform: 'scaleX(0)', transition: 'transform .35s ease',
+                },
+                '&:hover': { transform: 'translateY(-6px)', bgcolor: '#fff', borderColor: 'brand.line', boxShadow: '0 18px 36px -22px rgba(0,0,0,.35)' },
+                '&:hover::before': { transform: 'scaleX(1)' },
+                '&:hover .valueIcon': { transform: 'scale(1.08)', bgcolor: 'primary.main', color: '#fff' },
               }}>
-                <Box className="valueIcon" sx={{ color: 'GREEN', mb: 2, transition: 'transform .28s ease' }}>
-                  <MaterialSymbol name={v.icon} sx={{ fontSize: 34 }} />
+                <Box className="valueIcon" sx={{
+                  width: 64, height: 64, mx: 'auto', mb: 2.5, borderRadius: '50%',
+                  bgcolor: 'rgba(0,102,0,.08)', color: 'primary.main',
+                  display: 'grid', placeItems: 'center',
+                  transition: 'transform .28s ease, background-color .28s ease, color .28s ease',
+                }}>
+                  <MaterialSymbol name={v.icon} sx={{ fontSize: 32 }} />
                 </Box>
-                <Typography sx={{ fontWeight: 700, fontSize: 15, textTransform: 'uppercase', letterSpacing: '.4px', color: 'primary.dark', mb: 1.25 }}>
+                <Typography sx={{ fontWeight: 700, fontSize: 16, textTransform: 'uppercase', letterSpacing: '.4px', color: 'primary.dark', lineHeight: 1.35, mb: 1.5 }}>
                   {v.title}
                 </Typography>
-                <RichParagraph value={v.copy} sx={{ fontSize: 13, color: 'text.secondary', lineHeight: 1.55 }} />
+                <RichParagraph value={v.copy} sx={{ fontSize: 14, color: 'text.secondary', lineHeight: 1.65, maxWidth: 340, mx: 'auto' }} />
               </Box>
             ))}
           </Box>
@@ -139,25 +182,26 @@ export default function AboutPage() {
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: missionVisionColumns(missionVision.items) }, gap: { xs: 3, md: 4 }, textAlign: 'center' }}>
             {missionVision.items.map((m, i) => (
               <Box key={i} sx={{
-                bgcolor: '#fff', borderRadius: 3, px: { xs: 3, sm: 4, md: 6 }, py: { xs: 4, md: 6 }, cursor: 'default',
-                border: '1px solid', borderColor: 'brand.line',
+                ...missionVisionCardVars(m),
+                bgcolor: 'var(--mv-bg)', borderRadius: 3, px: { xs: 3, sm: 4, md: 6 }, py: { xs: 4, md: 6 }, cursor: 'default',
+                border: '1px solid', borderColor: 'var(--mv-line)',
                 transition: 'transform .35s cubic-bezier(.2,.7,.2,1),  .35s ease, border-color .35s ease',
-                '&:hover': { transform: 'translateY(-6px)', borderColor: 'rgba(0,102,0,.25)' },
-                '&:hover .mvBadge': { bgcolor: 'primary.main', color: '#fff', },
+                '&:hover': { transform: 'translateY(-6px)', borderColor: 'var(--mv-heading)' },
+                '&:hover .mvBadge': { bgcolor: 'var(--mv-heading)', color: 'var(--mv-bg)', },
                 '&:hover .mvRule': { width: 56 },
               }}>
                 <Box className="mvBadge" sx={{
                   width: 68, height: 68, mx: 'auto', mb: 2, borderRadius: '50%',
-                  bgcolor: 'rgba(0,102,0,.08)', color: 'primary.main',
+                  bgcolor: 'var(--mv-tint)', color: 'var(--mv-heading)',
                   display: 'grid', placeItems: 'center',
                   transition: 'background-color .35s ease, color .35s ease,  .35s ease',
                 }}>
                   <MaterialSymbol name={m.icon} sx={{ fontSize: 36 }} />
                 </Box>
-                <Typography variant="h2" sx={{ color: 'primary.main', fontSize: { xs: 26, md: 32 }, mb: 1.25 }}>{m.title}</Typography>
-                <Box className="mvRule" sx={{ height: 3, width: 32, borderRadius: 2, bgcolor: 'primary.main', mx: 'auto', mb: { xs: 3, md: 4 }, transition: 'width .35s ease' }} />
+                <Typography variant="h2" sx={{ color: 'var(--mv-heading)', fontSize: { xs: 26, md: 32 }, mb: 1.25 }}>{m.title}</Typography>
+                <Box className="mvRule" sx={{ height: 3, width: 32, borderRadius: 2, bgcolor: 'var(--mv-heading)', mx: 'auto', mb: { xs: 3, md: 4 }, transition: 'width .35s ease' }} />
                 <Box
-                  sx={{ ...richTextSx, textAlign: 'left' }}
+                  sx={{ ...richTextSx, ...missionVisionBodySx }}
                   dangerouslySetInnerHTML={{ __html: sanitizeRichText(missionVisionBodyHtml(m)) }}
                 />
               </Box>

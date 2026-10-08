@@ -66,6 +66,7 @@ export const PAGE_SECTIONS = {
   ],
   about: [
     { id: 'hero', label: 'Hero' },
+    { id: 'purpose', label: 'Our Purpose' },
     { id: 'coreValues', label: 'Core Values' },
     { id: 'missionVision', label: 'Mission & Vision' },
     { id: 'whatWeDo', label: 'What We Do' },
