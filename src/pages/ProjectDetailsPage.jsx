@@ -1,14 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, Link as RouterLink } from 'react-router-dom'
-import { Box, Container, Typography, Stack, Button, TextField, Chip } from '@mui/material'
+import { Box, Container, Typography, Stack, Button, TextField, Chip, IconButton, Dialog } from '@mui/material'
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined'
 import Reveal from '../components/Reveal'
 import HeroTitleReveal from '../components/HeroTitleReveal'
 import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
-import { PROJECTS_PAGE_ID, projectsContentData, findProjectBySlug } from '../../shared/content/projectsContent'
+import { PROJECTS_PAGE_ID, projectsContentData, findProjectBySlug, projectHouseTypes } from '../../shared/content/projectsContent'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import CloseIcon from '@mui/icons-material/Close'
+import OpenInFullIcon from '@mui/icons-material/OpenInFull'
 import RichParagraph from '../../shared/content/RichParagraph'
 import PageSection from '../components/PageSection'
 import PageSections from '../components/PageSections'
@@ -70,6 +74,7 @@ export default function ProjectDetailsPage() {
   }
 
   const { hero, intro, gallery, features, inquiry } = project
+  const houseTypes = projectHouseTypes(project)
 
   return (
     <PageSections pageKey="project-details" layout={layout}>
@@ -233,6 +238,21 @@ export default function ProjectDetailsPage() {
       </Reveal>
       </PageSection>
 
+      <PageSection id="houseTypes" layout={layout}>
+      {/* House Types */}
+      <Reveal variant="up">
+      <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: 'brand.surface' }}>
+        <Container>
+          <Stack sx={{ mb: 5, alignItems: 'center', textAlign: 'center' }}>
+            <Typography variant="h2" sx={{ color: 'primary.main', fontSize: { xs: 28, md: 38 } }}>{houseTypes.title}</Typography>
+            <RichParagraph value={houseTypes.description} sx={{ mt: 1.5, color: 'text.secondary', fontSize: 15.5, maxWidth: 700 }} />
+          </Stack>
+          <HouseTypesGallery items={houseTypes.items} />
+        </Container>
+      </Box>
+      </Reveal>
+      </PageSection>
+
       <PageSection id="inquiry" layout={layout}>
       {/* Begin your journey */}
       <Reveal variant="left">
@@ -329,6 +349,188 @@ function ExpandingGallery({ items }) {
           </Box>
         )
       })}
+    </Box>
+  )
+}
+
+const pad = (n) => String(n).padStart(2, '0')
+
+// House-type showcase: a numbered selector beside a cross-fading photo stage,
+// with a thumbnail strip for the selected type's photos.
+function HouseTypesGallery({ items }) {
+  const [active, setActive] = useState(0)
+  const [photo, setPhoto] = useState(0)
+  const [zoomed, setZoomed] = useState(false)
+
+  // Freeze the page behind the enlarged photo. The dialog's own scroll lock
+  // isn't enough: the site's smooth-scroll handler and iOS Safari both still
+  // move the page, so swallow wheel and one-finger touch scrolling before
+  // anything else sees them. Pinch-zoom (two fingers) is left alone.
+  useEffect(() => {
+    if (!zoomed) return undefined
+    const block = (e) => {
+      if (e.type === 'touchmove' && e.touches.length > 1) return
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    const opts = { capture: true, passive: false }
+    window.addEventListener('wheel', block, opts)
+    window.addEventListener('touchmove', block, opts)
+    return () => {
+      window.removeEventListener('wheel', block, opts)
+      window.removeEventListener('touchmove', block, opts)
+    }
+  }, [zoomed])
+
+  const type = items[Math.min(active, items.length - 1)]
+  if (!type) return null
+  const images = type.images
+  const shown = Math.min(photo, Math.max(images.length - 1, 0))
+
+  const select = (i) => { setActive(i); setPhoto(0) }
+  const step = (d) => setPhoto((p) => (p + d + images.length) % images.length)
+  const arrow = {
+    bgcolor: 'rgba(255,255,255,.16)', color: '#fff', backdropFilter: 'blur(4px)',
+    '&:hover': { bgcolor: 'rgba(255,255,255,.32)' },
+  }
+
+  return (
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '360px 1fr' }, gap: { xs: 3, md: 5 }, alignItems: 'start' }}>
+      {/* Selector */}
+      <Stack>
+        {items.map((it, i) => {
+          const isActive = i === active
+          return (
+            <Box
+              key={i}
+              component="button"
+              type="button"
+              onClick={() => select(i)}
+              aria-pressed={isActive}
+              sx={{
+                display: 'flex', gap: 2.5, alignItems: 'flex-start', width: '100%', textAlign: 'left',
+                font: 'inherit', cursor: 'pointer', bgcolor: isActive ? '#fff' : 'transparent',
+                border: 0, borderLeft: '3px solid', borderColor: isActive ? 'primary.main' : 'brand.line',
+                borderRadius: '0 8px 8px 0', py: 2.25, px: 2.5,
+                transition: 'background-color .3s ease, border-color .3s ease',
+                '&:hover': { borderColor: 'primary.main' },
+              }}
+            >
+              <Box sx={{ minWidth: 0 }}>
+                <Typography sx={{ fontWeight: 700, fontSize: 16, textTransform: 'uppercase', letterSpacing: '.4px', color: isActive ? 'text.primary' : 'text.secondary' }}>
+                  {it.title}
+                </Typography>
+                <Box sx={{
+                  display: 'grid', gridTemplateRows: isActive ? '1fr' : '0fr', opacity: isActive ? 1 : 0,
+                  transition: 'grid-template-rows .45s ease, opacity .45s ease',
+                }}>
+                  <Box sx={{ overflow: 'hidden' }}>
+                    <RichParagraph value={it.copy} sx={{ fontSize: 14, color: 'text.secondary', mt: 1 }} />
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          )
+        })}
+      </Stack>
+
+      {/* Stage */}
+      <Box sx={{ minWidth: 0 }}>
+        <Box sx={{ position: 'relative', height: { xs: 280, sm: 360, md: 460 }, borderRadius: 2, overflow: 'hidden', bgcolor: '#0c3d0c' }}>
+          {images.map((src, i) => (
+            <Box key={`${active}-${i}`} aria-hidden sx={{
+              position: 'absolute', inset: 0, backgroundImage: `url(${src})`, backgroundSize: 'cover', backgroundPosition: 'center',
+              opacity: i === shown ? 1 : 0, transform: i === shown ? 'scale(1)' : 'scale(1.06)',
+              transition: 'opacity .7s ease, transform 1.4s cubic-bezier(.2,.7,.2,1)',
+            }} />
+          ))}
+          <Box aria-hidden sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 50%, rgba(3,40,3,.85))' }} />
+          {images.length > 0 && (
+            <IconButton aria-label={`Enlarge ${type.title} photo`} onClick={() => setZoomed(true)}
+              sx={{ position: 'absolute', top: 12, left: 12, width: 36, height: 36, color: '#fff', bgcolor: 'rgba(0,0,0,.35)', backdropFilter: 'blur(4px)', '&:hover': { bgcolor: 'rgba(0,0,0,.55)' } }}>
+              <OpenInFullIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
+          {images.length > 0 && (
+            <Typography sx={{ position: 'absolute', top: 16, right: 18, color: '#fff', fontSize: 13, fontWeight: 600, letterSpacing: '1px', textShadow: '0 1px 6px rgba(0,0,0,.5)' }}>
+              {pad(shown + 1)} / {pad(images.length)}
+            </Typography>
+          )}
+          <Box sx={{ position: 'absolute', left: 0, bottom: 0, p: { xs: 2, md: 3 }, color: '#fff' }}>
+            <Typography sx={{ fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', color: '#a8ffa8', mb: .5 }}>
+              House Type {pad(active + 1)}
+            </Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: { xs: 20, md: 28 } }}>{type.title}</Typography>
+          </Box>
+          {images.length > 1 && (
+            <Stack direction="row" spacing={1} sx={{ position: 'absolute', right: { xs: 12, md: 20 }, bottom: { xs: 12, md: 20 } }}>
+              <IconButton aria-label="Previous photo" onClick={() => step(-1)} sx={arrow}><ChevronLeftIcon /></IconButton>
+              <IconButton aria-label="Next photo" onClick={() => step(1)} sx={arrow}><ChevronRightIcon /></IconButton>
+            </Stack>
+          )}
+        </Box>
+
+        {images.length > 1 && (
+          <Stack direction="row" spacing={1.5} sx={{ mt: 2, overflowX: 'auto', pb: .5 }}>
+            {images.map((src, i) => (
+              <Box
+                key={`${active}-${i}`}
+                component="button"
+                type="button"
+                onClick={() => setPhoto(i)}
+                aria-label={`${type.title} photo ${i + 1}`}
+                aria-pressed={i === shown}
+                sx={{
+                  flex: '0 0 auto', width: { xs: 76, md: 104 }, height: { xs: 52, md: 68 }, p: 0, cursor: 'pointer',
+                  borderRadius: 1.5, border: '2px solid', borderColor: i === shown ? 'primary.main' : 'transparent',
+                  backgroundImage: `url(${src})`, backgroundSize: 'cover', backgroundPosition: 'center',
+                  opacity: i === shown ? 1 : .6, transition: 'opacity .3s ease, border-color .3s ease',
+                  '&:hover': { opacity: 1 },
+                }}
+              />
+            ))}
+          </Stack>
+        )}
+      </Box>
+
+      {/* Enlarged view */}
+      <Dialog
+        open={zoomed && images.length > 0}
+        onClose={() => setZoomed(false)}
+        maxWidth={false}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') step(-1)
+          if (e.key === 'ArrowRight') step(1)
+        }}
+        slotProps={{
+          backdrop: { sx: { bgcolor: 'rgba(2,20,2,.92)' } },
+          paper: { sx: { bgcolor: 'transparent', boxShadow: 'none', m: { xs: 1, md: 4 }, overflow: 'visible', alignItems: 'center' } },
+        }}
+      >
+        <IconButton aria-label="Close" onClick={() => setZoomed(false)}
+          sx={{ ...arrow, position: 'fixed', top: { xs: 12, md: 24 }, right: { xs: 12, md: 24 } }}>
+          <CloseIcon />
+        </IconButton>
+        {/* Same cross-fade and settle-in zoom as the stage. */}
+        <Box sx={{ position: 'relative', width: { xs: '94vw', md: '86vw' }, height: { xs: '70vh', md: '80vh' }, overflow: 'hidden' }}>
+          {images.map((src, i) => (
+            <Box key={`${active}-${i}`} component="img" src={src} alt={i === shown ? `${type.title} photo ${i + 1}` : ''} aria-hidden={i !== shown}
+              sx={{
+                position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain',
+                opacity: i === shown ? 1 : 0, transform: i === shown ? 'scale(1)' : 'scale(1.06)',
+                transition: 'opacity .7s ease, transform 1.4s cubic-bezier(.2,.7,.2,1)',
+              }} />
+          ))}
+        </Box>
+        <Stack direction="row" sx={{ mt: 2, alignItems: 'center', gap: 2, color: '#fff' }}>
+          {images.length > 1 && <IconButton aria-label="Previous photo" onClick={() => step(-1)} sx={arrow}><ChevronLeftIcon /></IconButton>}
+          <Typography sx={{ fontWeight: 600, fontSize: 15, textAlign: 'center' }}>
+            {type.title}
+            <Box component="span" sx={{ ml: 1.5, color: 'rgba(255,255,255,.65)', fontWeight: 400 }}>{pad(shown + 1)} / {pad(images.length)}</Box>
+          </Typography>
+          {images.length > 1 && <IconButton aria-label="Next photo" onClick={() => step(1)} sx={arrow}><ChevronRightIcon /></IconButton>}
+        </Stack>
+      </Dialog>
     </Box>
   )
 }

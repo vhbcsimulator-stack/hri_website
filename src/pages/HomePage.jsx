@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import {
   Box,
@@ -14,6 +14,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import Reveal from '../components/Reveal'
+import OriginLightbox from '../components/OriginLightbox'
 import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
 import MaterialSymbol from '../../shared/content/MaterialSymbol'
@@ -650,8 +651,27 @@ function WhyChooseUs({ whyChooseUs }) {
   )
 }
 
-// Feature-focused spotlight section.
+// Feature-focused spotlight section. Hovering a key feature reveals a small
+// photo in its upper-right corner; clicking grows that photo to full screen.
+// Features without their own photo use the section's image.
 function PropertyFeatures({ propertyFeatures }) {
+  const [zoom, setZoom] = useState(null)
+  // The feature whose thumbnail is in flight. Hidden while its photo is open
+  // (the photo *is* the thumbnail), shown again while it flies back so it
+  // lands on something, then released once the lightbox has gone.
+  const [flight, setFlight] = useState(null)
+  const photoOf = (k) => k.image || propertyFeatures.image
+
+  const openFeature = (e, k, i) => {
+    const thumb = e.currentTarget.querySelector('.keyThumb') || e.currentTarget
+    setZoom({ src: photoOf(k), title: k.title, eyebrow: propertyFeatures.featuresLabel, origin: thumb.getBoundingClientRect() })
+    setFlight({ index: i, returning: false })
+  }
+  const closeFeature = () => {
+    setZoom(null)
+    setFlight((f) => f && { ...f, returning: true })
+  }
+
   return (
     <Box component="section" sx={{
       position: 'relative', py: { xs: 9, md: 12.5 }, color: '#fff', overflow: 'hidden',
@@ -679,19 +699,42 @@ function PropertyFeatures({ propertyFeatures }) {
               {propertyFeatures.featuresLabel}
             </Typography>
             <Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2.75 }}>
-              {propertyFeatures.features.map((k) => (
-                <Box key={k.title} sx={{
-                  p: 1.5, mx: -1.5, borderRadius: 1.5, cursor: 'default',
-                  transition: 'background .25s ease, transform .25s ease',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,.07)', transform: 'translateY(-4px)' },
-                  '&:hover .keyTitle': { color: '#a8ffa8' },
-                }}>
-                  <Typography className="keyTitle" variant="h4" sx={{ color: '#fff', fontSize: 14, textTransform: 'uppercase', letterSpacing: '.5px', transition: 'color .25s ease' }}>
+              {propertyFeatures.features.map((k, i) => {
+                const inFlight = flight?.index === i
+                const thumbShown = { opacity: 1, transform: 'translateY(0) scale(1)' }
+                return (
+                <Box
+                  key={k.title}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`View ${k.title} photo`}
+                  onClick={(e) => openFeature(e, k, i)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFeature(e, k, i) } }}
+                  sx={{
+                    position: 'relative', p: 1.5, mx: -1.5, borderRadius: 1.5, cursor: 'pointer', outline: 'none',
+                    transition: 'background .25s ease, transform .25s ease',
+                    '&:hover, &:focus-visible': { bgcolor: 'rgba(255,255,255,.07)', transform: 'translateY(-4px)' },
+                    '&:hover .keyTitle, &:focus-visible .keyTitle': { color: '#a8ffa8' },
+                    '&:hover .keyThumb, &:focus-visible .keyThumb': inFlight ? {} : thumbShown,
+                  }}
+                >
+                  {/* Small preview photo; the lightbox grows out of this exact box. */}
+                  <Box className="keyThumb" aria-hidden sx={{
+                    position: 'absolute', top: -14, right: -6, zIndex: 1, width: 48, height: 48, borderRadius: '8px',
+                    backgroundImage: `url(${photoOf(k)})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#0c3d0c',
+                    border: '2px solid rgba(255,255,255,.85)', boxShadow: '0 6px 18px rgba(0,0,0,.35)', pointerEvents: 'none',
+                    opacity: 0, transform: 'translateY(6px) scale(.8)',
+                    transition: 'opacity .3s ease, transform .35s cubic-bezier(.2,.7,.2,1)',
+                    '@media (hover: none)': thumbShown,
+                    ...(inFlight && (flight.returning ? thumbShown : { opacity: 0, transition: 'none' })),
+                  }} />
+                  <Typography className="keyTitle" variant="h4" sx={{ color: '#fff', fontSize: 14, textTransform: 'uppercase', letterSpacing: '.5px', transition: 'color .25s ease', pr: 4.5 }}>
                     {k.title}
                   </Typography>
                   <RichParagraph value={k.copy} sx={{ mt: 1, fontSize: 13, color: 'rgba(255,255,255,.7)' }} />
                 </Box>
-              ))}
+                )
+              })}
             </Box>
           </Box>
           <Box aria-hidden sx={{
@@ -710,6 +753,7 @@ function PropertyFeatures({ propertyFeatures }) {
           }} />
         </Box>
       </Container>
+      <OriginLightbox item={zoom} onClose={closeFeature} onExited={() => setFlight(null)} />
     </Box>
   )
 }

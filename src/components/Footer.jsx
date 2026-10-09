@@ -67,8 +67,7 @@ export default function Footer() {
          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <LocationOnIcon fontSize="large" />
             <Typography sx={{ mt: 2, fontSize: 13.5, lineHeight: 1.6, textAlign: "center" }}>
-              Royale Tagaytay Estates,<br />
-              Brgy. Upli, Alfonso, Cavite
+              Pilpila, Sta. Ignacia, Tarlac.
             </Typography>
           </Box>
           {footerCols.map((col) => (

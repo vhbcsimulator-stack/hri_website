@@ -109,8 +109,7 @@ export default function AboutPage() {
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.1fr' }, gap: { xs: 4, md: 8 }, alignItems: 'center' }}>
             <Box>
               <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, mb: 2 }}>
-                <Box sx={{ width: 34, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#0000FF,#006600)' }} />
-                <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 12.5, fontWeight: 600, color: 'primary.main' }}>
+                <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 22.5, fontWeight: 600, color: 'primary.main', textDecoration: 'underline', textDecorationColor: 'rgba(0,102,0,.3)', textDecorationThickness: 2 }}>
                   {purpose.eyebrow}
                 </Typography>
               </Stack>

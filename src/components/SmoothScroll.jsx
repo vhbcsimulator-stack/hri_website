@@ -14,6 +14,15 @@ function hasScrollableParent(target) {
   return false
 }
 
+// A modal (dialog, lightbox, drawer) locks the page by hiding its overflow.
+// That only stops the user's own scrolling — window.scrollTo still works — so
+// the loop must check for the lock itself.
+function isScrollLocked() {
+  return [document.body, document.documentElement].some(
+    (element) => window.getComputedStyle(element).overflowY === 'hidden',
+  )
+}
+
 const EASING = 0.14
 
 export default function SmoothScroll() {
@@ -67,6 +76,10 @@ export default function SmoothScroll() {
 
     const onWheel = (event) => {
       if (event.ctrlKey || event.metaKey || hasScrollableParent(event.target)) return
+      if (isScrollLocked()) {
+        release()
+        return
+      }
 
       event.preventDefault()
       document.documentElement.style.scrollBehavior = 'auto'

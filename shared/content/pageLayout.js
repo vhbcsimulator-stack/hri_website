@@ -84,6 +84,7 @@ export const PAGE_SECTIONS = {
     { id: 'intro', label: 'Introduction' },
     { id: 'gallery', label: 'Gallery' },
     { id: 'features', label: 'Key Features' },
+    { id: 'houseTypes', label: 'House Types' },
     { id: 'inquiry', label: 'Inquiry' },
   ],
   'privacy-policy': BANNER_AND_BODY,

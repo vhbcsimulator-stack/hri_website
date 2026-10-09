@@ -8,6 +8,48 @@ export const PROJECTS_PAGE_ID = 'projects'
 // /project-details?slug=… page renders one entry. Feature icons are Google
 // Material Symbols names (see fonts.google.com/icons).
 
+// The house types offered in a project, each with its own photo set. Projects
+// saved before this section existed have no `houseTypes`, and early saves kept
+// a single `image` per type, so readers go through projectHouseTypes().
+const HOUSE_PHOTO = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1400&q=80`
+export const DEFAULT_HOUSE_TYPES = {
+  title: 'House Types',
+  description: 'Choose the home that fits your family, lifestyle, and budget.',
+  items: [
+    {
+      title: 'Row House',
+      copy: 'Practical, budget-friendly homes built side by side in a continuous row.',
+      images: [HOUSE_PHOTO('photo-1600566753086-00f18fb6b3ea'), HOUSE_PHOTO('photo-1613977257363-707ba9348227'), HOUSE_PHOTO('photo-1600047509807-ba8f99d2cdde')],
+    },
+    {
+      title: 'Single Attached',
+      copy: 'A home sharing one wall with its neighbor, with open space on the other side.',
+      images: [HOUSE_PHOTO('photo-1564013799919-ab600027ffc6'), HOUSE_PHOTO('photo-1600607687939-ce8a6c25118c'), HOUSE_PHOTO('photo-1512917774080-9991f1c4c750')],
+    },
+    {
+      title: 'Duplex and Triplex',
+      copy: 'Two or three units in one building — ideal for extended families or rental income.',
+      images: [HOUSE_PHOTO('photo-1600607687939-ce8a6c25118c'), HOUSE_PHOTO('photo-1570129477492-45c003edd2be'), HOUSE_PHOTO('photo-1600566753086-00f18fb6b3ea')],
+    },
+    {
+      title: 'Single Detached',
+      copy: 'A standalone home with open space on all sides for maximum privacy.',
+      images: [HOUSE_PHOTO('photo-1600585154340-be6161a56a0c'), HOUSE_PHOTO('photo-1512917774080-9991f1c4c750'), HOUSE_PHOTO('photo-1613977257363-707ba9348227')],
+    },
+  ],
+}
+
+export const projectHouseTypes = (project) => {
+  const houseTypes = project?.houseTypes || DEFAULT_HOUSE_TYPES
+  return {
+    ...houseTypes,
+    items: (houseTypes.items || []).map(({ image, ...item }) => ({
+      ...item,
+      images: item.images || (image ? [image] : []),
+    })),
+  }
+}
+
 // A full project record. `slug` is the stable id used in the URL; the listing
 // fields (cover/title/status/location/summary/type) feed the table and the
 // public showcase, and the nested sections feed the detail page.
@@ -55,6 +97,7 @@ function makeProject(overrides = {}) {
         { icon: 'auto_awesome', title: 'Quality Finishes', copy: 'Carefully selected materials and refined details that enhance the overall look and feel of the home.', dark: true },
       ],
     },
+    houseTypes: structuredClone(DEFAULT_HOUSE_TYPES),
     inquiry: {
       title: 'Begin Your Journey Today',
       description: 'Interested in learning more about the project? Share your details, and our property specialist will assist you with available options, project information, and site-viewing arrangements.',

@@ -73,10 +73,11 @@ export const homeContentData = {
     description:
       'Whether you are planning a future home, a nature-inspired retreat, or a business development, HRI offers property categories suited to different needs and aspirations.',
     featuresLabel: 'Key Features',
+    // `image` is the photo a feature opens; without one it shows `image` below.
     features: [
-      { title: 'Thoughtful Design', copy: 'Functional spaces created for everyday comfort.' },
-      { title: 'Refined Interiors', copy: 'Elegant details that enhance the living experience.' },
-      { title: 'Peaceful Community', copy: 'A welcoming environment surrounded by natural scenery.' },
+      { title: 'Thoughtful Design', copy: 'Functional spaces created for everyday comfort.', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80' },
+      { title: 'Refined Interiors', copy: 'Elegant details that enhance the living experience.', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=80' },
+      { title: 'Peaceful Community', copy: 'A welcoming environment surrounded by natural scenery.', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=80' },
     ],
     image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80',
   },
