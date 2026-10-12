@@ -152,11 +152,10 @@ export default function ProjectsPage() {
         <Container sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
           <Box ref={headingRef} sx={{ willChange: 'transform, opacity' }}>
             <Typography variant="h1" sx={{ fontSize: { xs: 44, md: 84 }, fontWeight: 800, mb: 2 }}>
-              <HeroTitleReveal>Our Projects</HeroTitleReveal>
+              <HeroTitleReveal>{content.listingHero?.title || projectsContentData.listingHero.title}</HeroTitleReveal>
             </Typography>
             <Typography sx={{ maxWidth: 760, mx: 'auto', fontSize: { xs: 15, md: 18 }, fontWeight: 300, color: 'rgba(255,255,255,.9)', mb: 5 }}>
-              Explore thoughtfully planned residential, leisure, and commercial property developments designed
-              to support different lifestyles, business goals, and long-term plans.
+              {content.listingHero?.subtitle ?? projectsContentData.listingHero.subtitle}
             </Typography>
           </Box>
 

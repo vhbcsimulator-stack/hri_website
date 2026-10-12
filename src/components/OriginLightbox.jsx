@@ -94,7 +94,7 @@ export default function OriginLightbox({ item, onClose, onExited }) {
           }} />
           {/* Fine inner rule that fades in once landed. */}
           <Box aria-hidden sx={{
-            position: 'absolute', inset: 14, border: '1px solid rgba(255,255,255,.45)', borderRadius: '2px', pointerEvents: 'none',
+            position: 'absolute', inset: 14, borderRadius: '2px', pointerEvents: 'none',
             opacity: expanded ? 1 : 0, transform: expanded ? 'scale(1)' : 'scale(1.03)',
             transition: `opacity 500ms ease ${captionDelay(expanded)}, transform 700ms ${EASE} ${captionDelay(expanded)}`, ...reduced,
           }} />

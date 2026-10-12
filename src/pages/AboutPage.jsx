@@ -1,6 +1,8 @@
 import { Box, Container, Typography, Stack, Button } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
+import { useState } from 'react'
 import Reveal from '../components/Reveal'
+import OriginLightbox from '../components/OriginLightbox'
 import HeroTitleReveal from '../components/HeroTitleReveal'
 import TypewriterText from '../components/TypewriterText'
 import usePageContent from '../hooks/usePageContent'
@@ -42,6 +44,18 @@ export default function AboutPage() {
   const { hero, purpose, coreValues, missionVision, whatWeDo, whyChoose, cta } = content
 
   const layout = getLayout(content, 'about')
+
+  // What We Do: a clicked service photo grows from its card to full screen.
+  const [zoom, setZoom] = useState(null)
+  const [flight, setFlight] = useState(null)
+  const openService = (e, item, i) => {
+    setZoom({ src: item.image, title: item.label, eyebrow: whatWeDo.title, origin: e.currentTarget.getBoundingClientRect() })
+    setFlight({ index: i, returning: false })
+  }
+  const closeService = () => {
+    setZoom(null)
+    setFlight((f) => f && { ...f, returning: true })
+  }
   return (
     <PageSections pageKey="about" layout={layout}>
       <PageSection id="hero" layout={layout}>
@@ -107,20 +121,51 @@ export default function AboutPage() {
       <Box component="section" sx={{ py: { xs: 8, md: 11 }, bgcolor: 'brand.surface' }}>
         <Container>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.1fr' }, gap: { xs: 4, md: 8 }, alignItems: 'center' }}>
-            <Box>
+            <Box sx={{
+              cursor: 'default',
+              '&:hover .purposeEyebrow': { textDecorationColor: 'rgba(0,102,0,.75)', textUnderlineOffset: '9px' },
+            }}>
               <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, mb: 2 }}>
-                <Typography sx={{ textTransform: 'uppercase', letterSpacing: '3px', fontSize: 22.5, fontWeight: 600, color: 'primary.main', textDecoration: 'underline', textDecorationColor: 'rgba(0,102,0,.3)', textDecorationThickness: 2 }}>
+                <Typography className="purposeEyebrow" sx={{
+                  textTransform: 'uppercase', letterSpacing: '3px', fontSize: 22.5, fontWeight: 600, color: 'primary.main',
+                  textDecoration: 'underline', textDecorationColor: 'rgba(0,102,0,.3)', textDecorationThickness: 2, textUnderlineOffset: '5px',
+                  transition: 'text-decoration-color .35s ease, text-underline-offset .35s ease',
+                }}>
                   {purpose.eyebrow}
                 </Typography>
               </Stack>
               <Typography variant="h2" sx={{ color: 'primary.dark', fontSize: { xs: 28, md: 38 }, textTransform: 'none', lineHeight: 1.15 }}>
                 {purpose.titleLead}{' '}
-                <Box component="span" sx={{ color: 'primary.main' }}>{purpose.titleHighlight}</Box>
+                {/* Underline sweeps in beneath the highlight on hover. */}
+                <Box component="span" className="purposeHighlight" sx={{
+                  color: 'primary.main', pb: '2px',
+                  backgroundImage: 'linear-gradient(90deg, #006600, #0000FF)', backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'left bottom', backgroundSize: '0% 3px',
+                  transition: 'background-size .5s cubic-bezier(.2,.7,.2,1)',
+                }}>
+                  {purpose.titleHighlight}
+                </Box>
               </Typography>
             </Box>
-            <Box>
-              <RichParagraph value={purpose.para1} sx={{ color: 'text.secondary', fontSize: 16, mb: 3 }} />
-              <Box sx={{ borderLeft: '3px solid', borderColor: 'primary.main', pl: 2.5 }}>
+            <Box sx={{ cursor: 'default' }}>
+              <RichParagraph value={purpose.para1} sx={{
+                color: 'text.secondary', fontSize: 16, mb: 3, transition: 'color .3s ease',
+                '&:hover': { color: 'text.primary' },
+              }} />
+              {/* Quote: a soft fill slides out from the border on hover. */}
+              <Box sx={{
+                position: 'relative', overflow: 'hidden', borderLeft: '3px solid', borderColor: 'primary.main',
+                borderRadius: '0 8px 8px 0', pl: 2.5, pr: 2, py: 1.5, my: -1.5,
+                transition: 'border-left-width .3s ease',
+                '&::before': {
+                  content: '""', position: 'absolute', inset: 0, bgcolor: 'rgba(0,102,0,.07)',
+                  transform: 'scaleX(0)', transformOrigin: 'left', transition: 'transform .45s cubic-bezier(.2,.7,.2,1)',
+                },
+                '& > *': { position: 'relative', transition: 'transform .45s cubic-bezier(.2,.7,.2,1)' },
+                '&:hover': { borderLeftWidth: '5px' },
+                '&:hover::before': { transform: 'scaleX(1)' },
+                '&:hover > *': { transform: 'translateX(6px)' },
+              }}>
                 <RichParagraph value={purpose.para2} sx={{ color: 'primary.dark', fontSize: 17, fontWeight: 500 }} />
               </Box>
             </Box>
@@ -220,8 +265,18 @@ export default function AboutPage() {
           <RichParagraph value={whatWeDo.description} sx={{ textAlign: 'center', color: 'text.secondary', fontSize: 15.5, maxWidth: 780, mx: 'auto', mb: 6 }} />
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(5, 1fr)' }, gap: 2.5 }}>
             {whatWeDo.items.map((item, i) => (
-              <Box key={i} tabIndex={0} sx={{
-                height: { xs: 150, md: 350 }, borderRadius: 1.5, overflow: 'hidden', position: 'relative',
+              <Box
+                key={i}
+                tabIndex={0}
+                role="button"
+                aria-label={`View ${item.label} photo`}
+                onClick={(e) => openService(e, item, i)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openService(e, item, i) } }}
+                sx={{
+                height: { xs: 150, md: 350 }, borderRadius: 1.5, overflow: 'hidden', position: 'relative', cursor: 'pointer',
+                // While its photo is open the card's own image steps aside (the
+                // lightbox *is* this image); it returns as the photo flies back.
+                ...(flight?.index === i && !flight.returning && { '&&::before': { opacity: 0, transition: 'none' } }),
                 boxShadow: '0 12px 28px -14px rgba(0, 0, 0, 0.4)',
                 backgroundColor: '#0c3d0c',
                 transition: ' .3s ease, transform .3s ease',
@@ -257,6 +312,7 @@ export default function AboutPage() {
               </Box>
             ))}
           </Box>
+          <OriginLightbox item={zoom} onClose={closeService} onExited={() => setFlight(null)} />
         </Container>
       </Box>
       </Reveal>
